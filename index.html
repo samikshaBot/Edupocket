@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduPocket – Forgetfulness Detection</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    /* WHITE BACKGROUND */
+    :root{--bg:#ffffff;--bg2:#f5f7fa;--surface:#ffffff;--surface2:#f0f2f5;--border:#e2e6ea;--border2:#d0d5dd;--text:#1a1d23;--text2:#4b5563;--muted:#6b7280;--accent:#7c5cfc;--accent2:#43e89e;}
+    html,body{background:#fff!important;color:#1a1d23!important;}
+    .screen{background:#fff!important;}
+    .card{background:#f5f7fa!important;border-color:#e2e6ea!important;color:#1a1d23!important;}
+    .auth-wrap{background:#fff!important;border:1px solid #d0d5dd!important;box-shadow:0 4px 24px rgba(0,0,0,.08)!important;}
+    .field-input,.field-select{background:#fff!important;border:1.5px solid #d0d5dd!important;color:#1a1d23!important;}
+    .field-input::placeholder,.field-select{color:#9ca3af!important;}
+    .field-label{color:#4b5563!important;}
+    .card-label{color:#1a1d23!important;font-weight:700;}
+    .card-hint,.screen-sub,.hero-sub{color:#6b7280!important;}
+    .stat-card{background:#fff!important;border:1px solid #e2e6ea!important;box-shadow:0 1px 6px rgba(0,0,0,.06)!important;}
+    .bottom-nav{background:#fff!important;border-top:1px solid #e2e6ea!important;box-shadow:0 -2px 12px rgba(0,0,0,.06)!important;}
+    .nav-btn{color:#6b7280!important;}.nav-btn.active{color:#7c5cfc!important;}
+    .auth-tabs{background:#f0f2f5!important;border:1px solid #e2e6ea!important;}
+    .auth-tab{color:#6b7280!important;}
+    .auth-tab.active{background:#fff!important;color:#1a1d23!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;}
+    h1,h2,h3,h4{color:#1a1d23!important;}.logo-tag{color:#7c5cfc!important;}
+    .step-tag{color:#6b7280!important;}.fpi-max,.fpi-desc{color:#6b7280!important;}
+    /* VIDEO CARDS */
+    .vid-card{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e2e6ea;border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:all .2s;text-decoration:none;}
+    .vid-card:hover{border-color:#ef4444;transform:translateY(-2px);box-shadow:0 4px 16px rgba(239,68,68,.12);}
+    .vid-thumb{width:52px;height:36px;background:linear-gradient(135deg,rgba(239,68,68,.15),rgba(239,68,68,.05));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;border:1px solid rgba(239,68,68,.2);}
+    .vid-info{flex:1;min-width:0;}
+    .vid-title{font-size:.84rem;font-weight:600;color:#1a1d23;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .vid-meta{font-size:.72rem;color:#6b7280;}
+    .vid-badge{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2);padding:2px 8px;border-radius:5px;font-size:.65rem;font-weight:700;font-family:'Space Mono',monospace;flex-shrink:0;}
+    /* AI CHAT BUTTON in classroom card */
+    .ai-chat-btn{display:flex;align-items:center;gap:10px;width:100%;background:linear-gradient(135deg,#7c5cfc,#5b3fe8);color:#fff;border:none;border-radius:12px;padding:14px 18px;font-size:.9rem;font-family:'Sora',sans-serif;font-weight:600;cursor:pointer;transition:all .2s;margin-top:12px;box-shadow:0 4px 16px rgba(124,92,252,.3);}
+    .ai-chat-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,92,252,.4);}
+    .chat-ico{font-size:1.3rem;}.chat-text{flex:1;text-align:left;}
+    .chat-sub{font-size:.72rem;opacity:.85;display:block;margin-top:1px;}
+    /* FAB */
+    #ai-chat-fab{position:fixed;bottom:80px;right:18px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c5cfc,#43e89e);border:none;color:#fff;font-size:1.4rem;cursor:pointer;box-shadow:0 6px 24px rgba(124,92,252,.45);z-index:1000;display:none;align-items:center;justify-content:center;transition:all .25s;}
+    #ai-chat-fab:hover{transform:scale(1.1);}
+    #ai-chat-fab.show{display:flex;}
+    /* CHAT WINDOW */
+    #ai-chat-window{position:fixed;bottom:148px;right:18px;width:320px;max-height:480px;background:#fff;border:1.5px solid #d0d5dd;border-radius:18px;box-shadow:0 16px 48px rgba(0,0,0,.14);z-index:1001;display:none;flex-direction:column;overflow:hidden;}
+    #ai-chat-window.open{display:flex;}
+    .cwh{background:linear-gradient(135deg,#7c5cfc,#5b3fe8);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;}
+    .cwav{width:32px;height:32px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+    .cwnm{font-size:.88rem;font-weight:700;}.cwst{font-size:.65rem;opacity:.85;}
+    .cwx{margin-left:auto;background:transparent;border:none;color:#fff;font-size:1.1rem;cursor:pointer;opacity:.8;}
+    .cwx:hover{opacity:1;}
+    #chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth;}
+    #chat-msgs::-webkit-scrollbar{width:3px;}
+    #chat-msgs::-webkit-scrollbar-thumb{background:#d0d5dd;border-radius:2px;}
+    .cm{max-width:88%;}.cm.bot{align-self:flex-start;}.cm.usr{align-self:flex-end;}
+    .cb{padding:8px 12px;border-radius:12px;font-size:.8rem;line-height:1.6;}
+    .cm.bot .cb{background:#f0f2f5;border:1px solid #e2e6ea;border-bottom-left-radius:3px;color:#1a1d23;}
+    .cm.usr .cb{background:linear-gradient(135deg,#7c5cfc,#5b3fe8);color:#fff;border-bottom-right-radius:3px;}
+    .ct{font-size:.58rem;color:#6b7280;margin-top:3px;}.cm.usr .ct{text-align:right;}
+    #chat-qr{padding:6px 10px;display:flex;gap:5px;flex-wrap:wrap;border-top:1px solid #e2e6ea;}
+    .cqb{background:#f0f2f5;border:1px solid #e2e6ea;color:#6b7280;padding:3px 8px;border-radius:100px;font-size:.65rem;cursor:pointer;transition:all .15s;font-family:'Space Mono',monospace;}
+    .cqb:hover{border-color:#7c5cfc;color:#7c5cfc;}
+    #chat-ir{padding:8px 10px;border-top:1px solid #e2e6ea;display:flex;gap:6px;align-items:center;}
+    #ci{flex:1;background:#f0f2f5;border:1.5px solid #e2e6ea;color:#1a1d23;padding:7px 10px;border-radius:8px;font-size:.78rem;font-family:'Sora',sans-serif;outline:none;transition:border-color .2s;}
+    #ci:focus{border-color:#7c5cfc;}#ci::placeholder{color:#9ca3af;}
+    #cs{width:32px;height:32px;border-radius:8px;border:none;background:linear-gradient(135deg,#7c5cfc,#5b3fe8);color:#fff;font-size:.9rem;cursor:pointer;transition:all .2s;}
+    #cs:hover{transform:scale(1.08);}
+    .cdots{display:flex;gap:3px;align-items:center;padding:4px 0;}
+    .cdots span{width:5px;height:5px;border-radius:50%;background:#9ca3af;animation:cd .8s ease infinite;}
+    .cdots span:nth-child(2){animation-delay:.15s;}.cdots span:nth-child(3){animation-delay:.3s;}
+    @keyframes cd{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="screen-auth">
+  <div class="auth-wrap">
+    <div class="auth-brand">
+      <div class="auth-brain">🧠</div>
+      <div class="logo-tag">EduPocket</div>
+      <h1 class="auth-title">Forgetfulness<br>Detection System</h1>
+      <p class="auth-tagline">Know exactly how your brain forgets.<br>Fix it with science.</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login"    onclick="Auth_UI.showTab('login')">Sign In</button>
+      <button class="auth-tab"        id="tab-register" onclick="Auth_UI.showTab('register')">Create Account</button>
+    </div>
+    <div id="form-login">
+      <div class="auth-field"><label class="field-label">Username</label><input class="field-input" id="login-user" type="text" placeholder="your username" autocomplete="username"/></div>
+      <div class="auth-field"><label class="field-label">Password</label><input class="field-input" id="login-pass" type="password" placeholder="your password" autocomplete="current-password"/></div>
+      <div class="auth-error" id="login-error"></div>
+      <button class="btn-primary" onclick="Auth_UI.login()">Sign In →</button>
+    </div>
+    <div id="form-register" style="display:none;">
+      <div class="auth-field"><label class="field-label">Choose a Username</label><input class="field-input" id="reg-user" type="text" placeholder="min. 3 characters" autocomplete="username"/></div>
+      <div class="auth-field"><label class="field-label">Choose a Password</label><input class="field-input" id="reg-pass" type="password" placeholder="min. 4 characters" autocomplete="new-password"/></div>
+      <div class="auth-error" id="reg-error"></div>
+      <button class="btn-primary" onclick="Auth_UI.register()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WELCOME -->
+<div class="screen" id="screen-welcome">
+  <div class="welcome-hero">
+    <div class="brain-icon">🧠</div>
+    <div class="logo-tag">EduPocket</div>
+    <h1>Forgetfulness<br>Detection System</h1>
+    <p class="hero-sub">Discover how your brain forgets — then build a smarter revision strategy using science-backed tools and AI coaching.</p>
+  </div>
+  <div class="feature-list card">
+    <div class="card-label">What you'll get</div>
+    <div class="feature-item"><span class="fi">🔢</span><div><strong>Forgetfulness Pattern Index (FPI)</strong><br><small>Your personal forgetting score out of 100</small></div></div>
+    <div class="feature-item"><span class="fi">🤖</span><div><strong>AI Study Coach + AI Chatbot</strong><br><small>Personalised study advice + live Q&A</small></div></div>
+    <div class="feature-item"><span class="fi">📉</span><div><strong>Memory Decay Simulation</strong><br><small>Live Ebbinghaus curve — see when you'll forget</small></div></div>
+    <div class="feature-item"><span class="fi">🏆</span><div><strong>Streak &amp; Badge System</strong><br><small>Earn badges, build study streaks</small></div></div>
+    <div class="feature-item"><span class="fi">🔥</span><div><strong>Forgetfulness Heatmap</strong><br><small>30-day visual memory decay chart</small></div></div>
+    <div class="feature-item"><span class="fi">⏰</span><div><strong>Spaced-Relearning Triggers</strong><br><small>Auto-scheduled personalised review plan</small></div></div>
+    <div class="feature-item"><span class="fi">🎓</span><div><strong>Classroom — Videos &amp; Notes</strong><br><small>Curated YouTube lessons for every subject</small></div></div>
+  </div>
+  <button class="btn-primary" onclick="App.goTo('screen-setup')">Start Setup →</button>
+</div>
+
+<!-- SETUP -->
+<div class="screen" id="screen-setup">
+  <div class="screen-header">
+    <div class="step-tag">Step 1 of 3 — Profile Setup</div>
+    <h2>Tell us about yourself</h2>
+    <p class="screen-sub">Personalises your forgetfulness report.</p>
+  </div>
+  <div class="card"><label class="field-label">Your Name</label><input class="field-input" id="user-name" type="text" placeholder="e.g. Vijaya Kolape" autocomplete="off"/></div>
+  <div class="card">
+    <div class="field-label">Select Your Subjects</div>
+    <p class="field-hint">Tap all that apply</p>
+    <div id="subject-categories"></div>
+    <div class="divider"></div>
+    <div class="field-label">Don't see your subject? Add it below</div>
+    <p class="field-hint">Any subject — music, law, architecture, etc.</p>
+    <div class="custom-row">
+      <input class="field-input" id="custom-subject" type="text" placeholder="Type any subject…"/>
+      <button class="btn-add" onclick="App.addCustomSubject()">+ Add</button>
+    </div>
+  </div>
+  <div class="card"><label class="field-label">Study Level</label>
+    <select class="field-select" id="study-level">
+      <option value="">— Select your level —</option>
+      <option>High School (Grade 9–12)</option><option>B.Tech / B.E. (Engineering)</option>
+      <option>M.Tech / M.E. (Postgrad Engineering)</option><option>BCA / MCA (Computer Applications)</option>
+      <option>Undergraduate (General)</option><option>Postgraduate (General)</option>
+      <option>Competitive Exam Prep (GATE, JEE, UPSC…)</option><option>Professional / Self-learning</option>
+    </select>
+  </div>
+  <div class="card"><label class="field-label">Daily Study Hours</label>
+    <select class="field-select" id="study-hours">
+      <option value="">— Select hours —</option>
+      <option>Less than 1 hour</option><option>1–2 hours</option>
+      <option>2–4 hours</option><option>4–6 hours</option><option>More than 6 hours</option>
+    </select>
+  </div>
+  <div class="card"><label class="field-label">Revision Style</label>
+    <select class="field-select" id="revision-style">
+      <option value="">— How do you revise? —</option>
+      <option>Flashcards / Anki</option><option>Re-reading notes</option>
+      <option>Practice questions / Past papers</option><option>Coding practice (for CS subjects)</option>
+      <option>Mind maps / Diagrams</option><option>I don't revise regularly</option>
+    </select>
+  </div>
+  <button class="btn-primary" onclick="App.startQuiz()">Continue to Memory Quiz →</button>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-top">
+    <div class="step-tag" id="quiz-step-label">Question 1 of 12</div>
+    <div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div>
+    <div class="quiz-category" id="quiz-category">Memory Retention</div>
+  </div>
+  <h2 class="quiz-question" id="quiz-question">Loading…</h2>
+  <p class="quiz-context"  id="quiz-context"></p>
+  <div class="quiz-options" id="quiz-options"></div>
+  <div class="quiz-feedback" id="quiz-feedback" style="display:none;"></div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="screen" id="screen-dashboard">
+  <div class="dash-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div class="logo-tag">EduPocket</div>
+      <div class="streak-chip" id="streak-chip">🔥 0 day streak</div>
+    </div>
+    <h2 id="dash-greeting">Welcome back!</h2>
+    <p id="dash-subjects-line" class="screen-sub"></p>
+  </div>
+  <!-- FPI Ring -->
+  <div class="card fpi-card">
+    <div class="card-label">Forgetfulness Pattern Index</div>
+    <div class="fpi-wrap">
+      <div class="fpi-ring-container">
+        <canvas id="fpi-canvas" width="160" height="160"></canvas>
+        <div class="fpi-center"><div class="fpi-number" id="fpi-number">--</div><div class="fpi-max">/100</div></div>
+      </div>
+      <div class="fpi-info">
+        <div class="fpi-level" id="fpi-level">—</div>
+        <div class="fpi-desc"  id="fpi-desc">Complete the quiz to see your score.</div>
+        <div class="fpi-tip"   id="fpi-tip"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-val green"  id="stat-accuracy">--%</div><div class="stat-lbl">Quiz Accuracy</div></div>
+    <div class="stat-card"><div class="stat-val yellow" id="stat-cogload">--</div>  <div class="stat-lbl">Cognitive Load</div></div>
+    <div class="stat-card"><div class="stat-val red"    id="stat-weak">--</div>     <div class="stat-lbl">Weakest Area</div></div>
+    <div class="stat-card"><div class="stat-val purple" id="stat-next">--d</div>   <div class="stat-lbl">Next Review</div></div>
+  </div>
+
+  <!-- CLASSROOM CARD with AI Chat button -->
+  <div class="card" style="background:linear-gradient(135deg,rgba(124,92,252,.08),rgba(67,232,158,.05));border-color:rgba(124,92,252,.3);">
+    <div class="card-label">🎓 Classroom — Videos, Notes &amp; AI Chat</div>
+    <p class="card-hint">Watch curated YouTube lessons, write personal notes, and chat with the AI assistant about any subject.</p>
+    <button class="btn-primary" onclick="App.openClassroom()"
+      style="margin-top:10px;background:linear-gradient(135deg,#7c5cfc,#43e89e);font-size:15px;width:100%;">
+      📚 Open My Classroom
+    </button>
+    <!-- AI CHATBOT BUTTON — NEW -->
+    <button class="ai-chat-btn" onclick="openAIChat()">
+      <span class="chat-ico">🤖</span>
+      <span class="chat-text">
+        Ask AI Study Assistant
+        <span class="chat-sub">FPI, subjects, memory tricks, interview tips…</span>
+      </span>
+      <span style="font-size:1.1rem;">→</span>
+    </button>
+  </div>
+  <!-- Badges -->
+  <div class="card"><div class="card-label">🏆 Achievement Badges</div><div id="badge-grid"></div></div>
+  <!-- Forgetfulness Type -->
+  <div class="card">
+    <div class="card-label">Forgetfulness Type Classification</div>
+    <p class="card-hint" id="type-intro"></p>
+    <div id="forget-type-list"></div>
+  </div>
+  <!-- Context Detection -->
+  <div class="card">
+    <div class="card-label">Context-Based Forgetfulness Detection</div>
+    <p class="card-hint">Smart patterns detected from your responses</p>
+    <div id="context-detection"></div>
+  </div>
+  <button class="btn-primary"   onclick="App.goNav('decay')">📉 View Memory Decay Simulation</button>
+  <button class="btn-secondary" onclick="App.goNav('heatmap')">View Forgetfulness Heatmap 🔥</button>
+  <button class="btn-secondary" onclick="App.goNav('triggers')">Spaced-Relearning Schedule ⏰</button>
+  <button class="btn-pdf"       id="pdf-export-btn" onclick="App.exportPDF()">⬇ Download PDF Report</button>
+  <button class="btn-logout"    onclick="App.logout()">Sign Out</button>
+</div>
+
+<!-- MEMORY DECAY -->
+<div class="screen" id="screen-decay">
+  <div class="screen-header"><div class="step-tag">Memory Science</div><h2>Memory Decay Simulation</h2><p class="screen-sub">Your personalised Ebbinghaus forgetting curve.</p></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-val green"  id="decay-h80"       style="font-size:16px;">--</div><div class="stat-lbl">Drops below 80%</div></div>
+    <div class="stat-card"><div class="stat-val yellow" id="decay-h50"       style="font-size:16px;">--</div><div class="stat-lbl">Drops below 50%</div></div>
+    <div class="stat-card"><div class="stat-val red"    id="decay-h20"       style="font-size:16px;">--</div><div class="stat-lbl">Drops below 20%</div></div>
+    <div class="stat-card"><div class="stat-val purple" id="decay-stability" style="font-size:16px;">--</div><div class="stat-lbl">Memory Strength</div></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Retention % Over 30 Days</div>
+    <div class="decay-legend"><span><span class="decay-dot red-dot"></span> Without revision</span><span><span class="decay-dot green-dot"></span> With spaced revision</span></div>
+    <div class="chart-wrap" style="height:260px;"><canvas id="decay-chart"></canvas></div>
+  </div>
+  <div class="card"><div class="card-label">Optimal Review Schedule</div><p class="card-hint">Review at these exact times to maximise retention:</p><div id="decay-reviews"></div></div>
+  <div class="card" style="border-color:rgba(124,92,252,.4);background:rgba(124,92,252,.05);">
+    <div class="card-label">The Ebbinghaus Science</div>
+    <p style="font-size:13px;color:#6b7280;line-height:1.7;">Hermann Ebbinghaus discovered in 1885 that memory decays exponentially without reinforcement. The formula <strong style="color:#1a1d23;">R = e^(−t/S)</strong> models this precisely. Your stability score S is calculated from your FPI — higher FPI means you forget faster. Spaced reviews increase S over time.</p>
+  </div>
+  <button class="btn-secondary" onclick="App.goNav('dashboard')">← Back to Dashboard</button>
+</div>
+
+<!-- HEATMAP -->
+<div class="screen" id="screen-heatmap">
+  <div class="screen-header"><div class="step-tag">Visualisation</div><h2>Forgetfulness Heatmap</h2><p class="screen-sub">Your simulated 30-day memory decay across all topics</p></div>
+  <div class="card">
+    <div class="card-label">Daily Forgetting Intensity</div>
+    <div class="heat-legend"><span class="heat-dot low"></span> Low &nbsp;<span class="heat-dot mid"></span> Medium &nbsp;<span class="heat-dot high"></span> High</div>
+    <div class="day-labels"   id="day-labels"></div>
+    <div class="heatmap-grid" id="heatmap-grid"></div>
+    <div class="heat-tooltip" id="heat-tooltip">Hover over a cell to see details</div>
+  </div>
+  <div class="card"><div class="card-label">Topic-by-Topic Forgetting Rate</div><div class="chart-wrap"><canvas id="topic-chart"></canvas></div></div>
+  <div class="card"><div class="card-label">Peak Forgetting Windows</div><div id="peak-windows"></div></div>
+  <button class="btn-secondary" onclick="App.goNav('dashboard')">← Back to Dashboard</button>
+</div>
+
+<!-- TRIGGERS -->
+<div class="screen" id="screen-triggers">
+  <div class="screen-header"><div class="step-tag">Spaced-Relearning System</div><h2>Your Review Triggers</h2><p class="screen-sub">Personalised relearning schedule based on your memory decay curve</p></div>
+  <div class="card cog-summary-card" id="cog-summary"></div>
+  <div id="trigger-list"></div>
+  <div class="card"><div class="card-label">Cognitive Load — Weekly Trend</div><div class="chart-wrap"><canvas id="load-chart"></canvas></div></div>
+  <div class="card"><div class="card-label">Recommended Study Plan</div><div id="study-plan"></div></div>
+  <button class="btn-secondary" onclick="App.goNav('dashboard')">← Back to Dashboard</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottom-nav" style="display:none;">
+  <button class="nav-btn active" id="nav-dashboard" onclick="App.goNav('dashboard')"><span>🏠</span><small>Home</small></button>
+  <button class="nav-btn"        id="nav-decay"      onclick="App.goNav('decay')">    <span>📉</span><small>Decay</small></button>
+  <button class="nav-btn"        id="nav-heatmap"    onclick="App.goNav('heatmap')">  <span>🔥</span><small>Heatmap</small></button>
+  <button class="nav-btn"        id="nav-triggers"   onclick="App.goNav('triggers')"> <span>⏰</span><small>Triggers</small></button>
+  <button class="nav-btn"        id="nav-quiz"       onclick="App.retakeQuiz()">       <span>🔄</span><small>Retake</small></button>
+  <button class="nav-btn"        id="nav-classroom"  onclick="App.openClassroom()">   <span>🎓</span><small>Class</small></button>
+  <button class="nav-btn"        id="nav-aichat"     onclick="openAIChat()">          <span>🤖</span><small>AI Chat</small></button>
+</nav>
+
+<!-- FLOATING AI CHAT BUTTON -->
+<button id="ai-chat-fab" onclick="toggleAIChat()" title="AI Study Assistant">🤖</button>
+
+<!-- AI CHAT WINDOW -->
+<div id="ai-chat-window">
+  <div class="cwh">
+    <div class="cwav">🤖</div>
+    <div><div class="cwnm">EduPocket AI</div><div class="cwst">● Online · Study Assistant</div></div>
+    <button class="cwx" onclick="toggleAIChat()">✕</button>
+  </div>
+  <div id="chat-msgs"></div>
+  <div id="chat-qr"></div>
+  <div id="chat-ir">
+    <input id="ci" type="text" placeholder="Ask about FPI, subjects, memory tips…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button id="cs" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- JS FILES -->
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/heatmap.js"></script>
+<script src="js/decay.js"></script>
+<script src="js/aicoach.js"></script>
+<script src="js/pdfexport.js"></script>
+<script src="js/app.js"></script>
+
+<!-- CLASSROOM CONNECTOR -->
+<script>
+App.openClassroom = function() {
+  try {
+    localStorage.setItem('ep_classroom_context', JSON.stringify({
+      profile:   App.profile,
+      username:  App.currentUser ? App.currentUser.username : null,
+      timestamp: Date.now()
+    }));
+  } catch(e) {}
+  window.location.href = 'classroom/classroom.html';
+};
+</script>
+
+<!-- VIDEO OPEN FIX — use data-url attribute, never put URL inside onclick -->
+<script>
+function openVid(el) {
+  var t = el.hasAttribute('data-url') ? el : el.closest('[data-url]');
+  var url = t ? t.getAttribute('data-url') : null;
+  if (url) window.open(url, '_blank');
+}
+</script>
+
+<!-- AI CHATBOT ENGINE -->
+<script>
+var _ci = false, _co = false, _de = null;
+
+function openAIChat()  { if (!_co) toggleAIChat(); }
+function closeAIChat() { if (_co)  toggleAIChat(); }
+
+function toggleAIChat() {
+  _co = !_co;
+
+
+
+
+
+
+
+
+
+
+
+  
+  document.getElementById('ai-chat-window').classList.toggle('open', _co);
+  if (_co && !_ci) { _ci = true; _greet(); }
+  if (_co) { var m=document.getElementById('chat-msgs'); setTimeout(function(){m.scrollTop=m.scrollHeight;},80); }
+}
+
+function _greet() {
+  _bot('Hey! 👋 I\'m your **EduPocket AI** study assistant.\n\nI can help with:\n• Your **FPI score** explanation\n• **Study tips** for Cloud, ML, IvP, Security, DAV\n• **Memory techniques** and spaced repetition\n• **Interview / viva preparation**\n\nWhat would you like to know?');
+  _chips(['What is FPI?','Study tips','Memory tricks','Interview prep','Cloud Computing','Machine Learning']);
+}
+
+function sendChat() {
+  var i=document.getElementById('ci'), msg=(i.value||'').trim();
+  if(!msg) return; i.value='';
+  _usr(msg); _dots();
+  setTimeout(function(){ _undots(); _bot(_reply(msg)); _chips(['FPI tips','Study plan','Memory tricks','Subject help','More']); }, 650);
+}
+
+function _usr(txt) {
+  var m=document.getElementById('chat-msgs');
+  var d=document.createElement('div'); d.className='cm usr';
+  var t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  d.innerHTML='<div class="cb">'+_esc(txt)+'</div><div class="ct">'+t+'</div>';
+  m.appendChild(d); m.scrollTop=m.scrollHeight;
+}
+function _bot(txt) {
+  var m=document.getElementById('chat-msgs');
+  var d=document.createElement('div'); d.className='cm bot';
+  var t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  var h=txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  d.innerHTML='<div class="cb">'+h+'</div><div class="ct">'+t+'</div>';
+  m.appendChild(d); m.scrollTop=m.scrollHeight;
+}
+function _dots() {
+  var m=document.getElementById('chat-msgs');
+  _de=document.createElement('div'); _de.className='cm bot'; _de.id='_de';
+  _de.innerHTML='<div class="cb"><div class="cdots"><span></span><span></span><span></span></div></div>';
+  m.appendChild(_de); m.scrollTop=m.scrollHeight;
+}
+function _undots(){ if(_de){_de.remove();_de=null;} }
+function _chips(list) {
+  document.getElementById('chat-qr').innerHTML = list.map(function(c){
+    return '<button class="cqb" onclick="(function(){document.getElementById(\'ci\').value='+JSON.stringify(c)+';sendChat();})()">' + c + '</button>';
+  }).join('');
+}
+function _esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _fpi(){ try{ return App&&App.profile&&App.profile.fpi!=null?App.profile.fpi:null; }catch(e){return null;} }
+
+function _reply(msg) {
+  var m=msg.toLowerCase().trim(), fpi=_fpi();
+  if(/^(hi|hello|hey|hii)\b/.test(m))
+    return 'Hey! 👋 Great to see you!\n\nAsk me about **FPI**, **study strategies**, **memory science**, **subject tips**, or **interview prep**.';
+  if(/fpi|forgetful.*pattern|my score|what.*fpi/.test(m)){
+    if(fpi!==null){var lv=fpi<30?'LOW ✅ excellent!':fpi<60?'MODERATE ⚠️ needs practice.':'HIGH 🚨 daily review required.';return '**Your FPI is '+fpi+'/100** — '+lv+'\n\n0–29 Low 🟢 · 30–59 Moderate 🟡 · 60–100 High 🔴\n\nCheck the **Triggers** screen for your review schedule!';}
+    return '**FPI (Forgetfulness Pattern Index)** = your memory decay risk (0–100).\n\n0–29 Low 🟢 · 30–59 Moderate 🟡 · 60–100 High 🔴\n\nComplete the quiz to get your score!';
+  }
+  if(/spaced|repetition|ebbinghaus|review.*schedule/.test(m))
+    return '**Spaced Repetition** — most powerful memory method:\n\n⏱️ 10 min → 1 day → 3 days → 1 week → 2 weeks → 1 month\n\nYour EduPocket trigger schedule is auto-calibrated to your FPI!';
+  if(/interview|viva|demo|explain.*topic|present/.test(m))
+    return '**Interview / Viva Tips:**\n\n1. **Concept → Intuition → Example** — always this order\n2. **Feynman Technique** — explain like teaching a 10-year-old\n3. For every topic: What? Why? Real example? Limitation?\n4. **Active recall** beats re-reading 3×\n5. Practice **out loud** — speaking cements memory faster';
+  if(/memory|remember|forget|trick|technique/.test(m))
+    return '**Top Memory Techniques:**\n\n🧠 **Active Recall** — test yourself, don\'t re-read\n🔁 **Spaced Repetition** — increasing intervals\n🍋 **Feynman** — teach it out loud\n🗺️ **Mind Maps** — connect ideas visually\n😴 **Sleep** — memory consolidates during deep sleep\n\nFor tech subjects: **code what you learn** — 3× better!';
+  if(/study.*plan|how.*study|prepare|schedule/.test(m)){
+    if(fpi!==null){
+      if(fpi>60) return '**Your FPI is '+fpi+' (High).** Priority:\n1. Review **tonight** — delay worsens decay\n2. Active recall every day\n3. 20-min Pomodoro blocks\n4. Follow your trigger schedule strictly';
+      if(fpi>30) return '**Your FPI is '+fpi+' (Moderate):**\n1. Review every 2–3 days\n2. Practice questions over re-reading\n3. Draw concept maps for weak topics\n4. Open Classroom for subject videos';
+      return '**Your FPI is '+fpi+' (Low) — excellent!**\n1. Maintain spaced review routine\n2. Teach topics to peers (90% retention)\n3. Attempt harder problems\n4. Connect concepts across subjects';
+    }
+    return 'Complete the quiz first to get a **personalised** study plan based on your FPI!';
+  }
+  if(/cloud|aws|azure|gcp|iaas|paas|saas|ec2|s3|lambda|vpc/.test(m))
+    return '**Cloud Computing Tips:**\n\n☁️ **"I Provide Software":**\n• IaaS = manage OS up (EC2)\n• PaaS = manage app+data (Heroku)\n• SaaS = just use it (Gmail)\n\n📐 Vertical = bigger machine · Horizontal = more machines\n🔐 IAM = Identity · VPC = Network · Encryption = Data\n\n💡 Deploy one free-tier EC2 — hands-on beats reading 3×!';
+  if(/\bml\b|machine.*learn|gradient|neural|overfit|bias|variance|forest|boost/.test(m))
+    return '**ML Study Tips:**\n\n⚖️ Bias=underfitting · Variance=overfitting\n📊 Precision=quality · Recall=coverage · F1=balance\n🌳 Random Forest = parallel (bagging)\nGradient Boost = sequential (boosting)\n\n💡 Implement k-NN from scratch — coding cements it permanently!';
+  if(/image|ivp|filter|sobel|canny|convol|morph|opencv|histog/.test(m))
+    return '**Image Processing Tips:**\n\n🔲 Convolution = flip kernel then slide\n🔍 Canny = best edge detector:\nSmooth → Gradient → NMS → Hysteresis\n🔵 Opening = removes noise · Closing = fills holes\n\n💡 Apply every filter to your own photo in OpenCV!';
+  if(/security|\bcss\b|cia|encrypt|sql.*inject|xss|csrf|firewall|tls|ids|ips/.test(m))
+    return '**Security Tips:**\n\n🔐 CIA: Confidentiality · Integrity · Availability\n🔑 Symmetric=same key (AES) · Asymmetric=public+private (RSA)\n⚠️ SQLi=malicious SQL · XSS=script in pages · CSRF=forged requests\n\n💡 For each attack: vector → CIA impact → prevention';
+  if(/dav|data.*anal|pandas|matplotlib|seaborn|eda|visuali|plotly/.test(m))
+    return '**Data Analysis Tips:**\n\n📊 Bar=categories · Histogram=distribution · Scatter=relationship\n🐼 Handle nulls → Encode → Scale (never reverse!)\n\nEDA: Load → describe() → nulls → distributions → correlation → **data story**\n\n💡 Always write a 3-sentence story for each chart!';
+  if(/weak|struggle|difficult|hard|problem/.test(m))
+    return 'To fix weak areas:\n\n1. Check quiz results — see lowest scored topics\n2. **Active recall** — close notes, write from memory\n3. **Spaced review** — revisit weak topics every 1–2 days\n4. Open **Classroom** — watch the video for that topic\n5. **Feynman** — explain the weak concept out loud\n\nWhich subject needs work?';
+  return 'I\'m here to help! 📚 Try:\n• **"What is FPI?"**\n• **"Study plan for ML"**\n• **"Cloud Computing tips"**\n• **"Memory tricks"**\n• **"Interview prep"**\n\nWhich subject are you studying right now?';
+}
+
+/* Show FAB when dashboard loads */
+(function(){
+  var iv=setInterval(function(){
+    if(typeof App!=='undefined'&&App.goNav){
+      var gn=App.goNav.bind(App);
+      App.goNav=function(s){gn(s);if(s==='dashboard')document.getElementById('ai-chat-fab').classList.add('show');};
+      var gt=App.goTo.bind(App);
+      App.goTo=function(s){gt(s);if(s==='screen-dashboard')document.getElementById('ai-chat-fab').classList.add('show');};
+      clearInterval(iv);
+    }
+  },200);
+})();
+</script>
+
+</body>
+</html>

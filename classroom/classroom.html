@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EduPocket – Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f5f7fa;--sur:#fff;--bdr:#e2e6ea;--bdr2:#d0d5dd;
+  --txt:#1a1d23;--txt2:#4b5563;--muted:#6b7280;
+  --accent:#7c5cfc;--accent2:#43e89e;
+  --red:#ef4444;--green:#10b981;--blue:#3b82f6;--yellow:#f59e0b;--orange:#f97316;
+}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',sans-serif;min-height:100vh;padding-bottom:60px}
+
+/* ── TOPBAR ── */
+.topbar{background:#fff;border-bottom:1px solid var(--bdr);padding:0 16px;height:54px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.back-btn{background:transparent;border:1.5px solid var(--bdr2);color:var(--txt2);padding:5px 12px;border-radius:8px;font-size:.78rem;font-family:'Sora',sans-serif;cursor:pointer;transition:all .2s}
+.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+.topbar-title{font-weight:700;font-size:.95rem;color:var(--accent)}
+.ai-top-btn{margin-left:auto;background:linear-gradient(135deg,#7c5cfc,#43e89e);color:#fff;border:none;border-radius:9px;padding:7px 14px;font-size:.75rem;font-family:'Sora',sans-serif;font-weight:600;cursor:pointer;transition:all .2s}
+.ai-top-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(124,92,252,.4)}
+
+/* ── HOME: CATEGORY LIST ── */
+#home-view{display:block}
+.home-content{padding:14px 14px 0}
+.search-wrap{margin-bottom:14px}
+.search-wrap input{width:100%;padding:10px 14px;border:1.5px solid var(--bdr2);border-radius:10px;font-size:.84rem;font-family:'Sora',sans-serif;outline:none;background:#fff;color:var(--txt);transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap input::placeholder{color:#9ca3af}
+
+.cat-block{margin-bottom:18px}
+.cat-label{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;margin-bottom:8px;padding:0 2px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:#fff;border:1.5px solid var(--bdr);border-radius:100px;padding:7px 14px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--txt2)}
+.chip:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px);box-shadow:0 2px 10px rgba(124,92,252,.12)}
+.chip.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ── SUBJECT VIEW ── */
+#subj-view{display:none}
+.subj-topbar{background:#fff;border-bottom:1px solid var(--bdr);padding:0 14px;height:54px;display:flex;align-items:center;gap:10px;position:sticky;top:54px;z-index:150;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.subj-back{background:transparent;border:1.5px solid var(--bdr2);color:var(--txt2);padding:5px 12px;border-radius:8px;font-size:.78rem;cursor:pointer;font-family:'Sora',sans-serif;transition:all .2s}
+.subj-back:hover{border-color:var(--accent);color:var(--accent)}
+.subj-name-bar{font-weight:700;font-size:.9rem;color:var(--txt);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.subj-content{padding:14px}
+.subj-hdr{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;margin-bottom:14px}
+.subj-ico{font-size:2rem}
+.subj-title{font-size:1.05rem;font-weight:700}
+.subj-cat{font-size:.72rem;color:var(--muted);margin-top:2px}
+
+/* inner tabs */
+.itabs{display:flex;gap:4px;background:#f0f2f5;border:1px solid var(--bdr);border-radius:10px;padding:4px;margin-bottom:14px}
+.itab{flex:1;padding:7px 4px;border:none;background:transparent;color:var(--muted);font-family:'Sora',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;border-radius:7px;transition:all .2s;white-space:nowrap}
+.itab.on{background:#fff;color:var(--txt);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.ipane{display:none}.ipane.on{display:block}
+
+/* notes */
+.note-chip{background:#fff;border:1px solid var(--bdr);border-radius:12px;padding:13px;margin-bottom:9px}
+.note-chip-t{font-size:.84rem;font-weight:700;color:var(--txt);margin-bottom:5px}
+.note-chip-b{font-size:.76rem;color:var(--txt2);line-height:1.7;white-space:pre-wrap}
+
+/* videos */
+.vid-hint{font-size:.74rem;color:var(--muted);background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:8px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.vid-card{display:flex;align-items:center;gap:11px;background:#fff;border:1.5px solid var(--bdr);border-radius:12px;padding:11px 13px;margin-bottom:9px;cursor:pointer;transition:all .2s}
+.vid-card:hover{border-color:#ef4444;transform:translateY(-2px);box-shadow:0 4px 14px rgba(239,68,68,.12)}
+.vid-thumb{width:52px;height:37px;background:linear-gradient(135deg,rgba(239,68,68,.15),rgba(239,68,68,.05));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;border:1px solid rgba(239,68,68,.2)}
+.vid-info{flex:1;min-width:0}
+.vid-title{font-size:.82rem;font-weight:600;color:var(--txt);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vid-meta{font-size:.68rem;color:var(--muted)}
+.vid-badge{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2);padding:2px 7px;border-radius:5px;font-size:.6rem;font-weight:700;font-family:'Space Mono',monospace;flex-shrink:0}
+.vid-arrow{color:#ef4444;font-size:.85rem;flex-shrink:0}
+
+/* q&a */
+.iq-item{background:#fff;border:1px solid var(--bdr);border-radius:12px;padding:13px;margin-bottom:9px}
+.iq-q{font-size:.83rem;font-weight:600;color:var(--txt);margin-bottom:7px;line-height:1.5}
+.iq-num{display:inline-block;background:var(--accent);color:#fff;border-radius:5px;padding:1px 7px;font-size:.68rem;font-weight:700;margin-right:5px;font-family:'Space Mono',monospace}
+.iq-btn{background:transparent;border:1.5px solid var(--bdr2);color:var(--accent);padding:4px 11px;border-radius:7px;font-size:.72rem;font-family:'Sora',sans-serif;cursor:pointer;transition:all .2s}
+.iq-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.iq-ans{display:none;margin-top:9px;padding:9px 11px;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;font-size:.76rem;color:var(--txt2);line-height:1.7;white-space:pre-wrap}
+
+/* my notes */
+.notes-ed textarea{width:100%;min-height:120px;background:#fff;border:1.5px solid var(--bdr2);color:var(--txt);padding:9px 11px;border-radius:10px;font-size:.8rem;font-family:'Sora',sans-serif;resize:vertical;outline:none;transition:border-color .2s;line-height:1.7}
+.notes-ed textarea:focus{border-color:var(--accent)}
+.notes-ed textarea::placeholder{color:#9ca3af}
+.note-title-inp{width:100%;padding:7px 11px;border:1.5px solid var(--bdr2);border-radius:8px;font-size:.8rem;font-family:'Sora',sans-serif;outline:none;background:#fff;color:var(--txt);margin-bottom:7px;transition:border-color .2s}
+.note-title-inp:focus{border-color:var(--accent)}
+.btn-save{background:var(--green);border:none;color:#fff;padding:8px 18px;border-radius:9px;font-size:.82rem;font-family:'Sora',sans-serif;font-weight:700;cursor:pointer;margin-top:7px;transition:all .2s}
+.btn-save:hover{background:#059669}
+.saved-note{background:#fff;border:1px solid var(--bdr);border-radius:10px;padding:11px;margin-bottom:7px}
+.sn-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.sn-title{font-size:.78rem;font-weight:700;color:var(--txt)}
+.sn-date{font-size:.63rem;color:var(--muted);font-family:'Space Mono',monospace}
+.sn-body{font-size:.74rem;color:var(--txt2);line-height:1.6;white-space:pre-wrap}
+.del-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:.88rem;transition:color .2s}
+.del-btn:hover{color:#ef4444}
+
+/* empty */
+.empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:.82rem}
+.empty span{font-size:1.8rem;display:block;margin-bottom:7px}
+
+/* AI CHATBOT */
+#chat-fab{position:fixed;bottom:18px;right:16px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#7c5cfc,#43e89e);border:none;color:#fff;font-size:1.25rem;cursor:pointer;box-shadow:0 4px 18px rgba(124,92,252,.45);z-index:300;display:flex;align-items:center;justify-content:center;transition:all .25s}
+#chat-fab:hover{transform:scale(1.1)}
+#chat-win{position:fixed;bottom:80px;right:16px;width:300px;max-height:440px;background:#fff;border:1.5px solid var(--bdr2);border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.14);z-index:301;display:none;flex-direction:column;overflow:hidden}
+#chat-win.open{display:flex}
+.cw-hdr{background:linear-gradient(135deg,#7c5cfc,#5b3fe8);color:#fff;padding:11px 13px;display:flex;align-items:center;gap:9px}
+.cw-av{width:28px;height:28px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.cw-nm{font-size:.84rem;font-weight:700}.cw-st{font-size:.6rem;opacity:.85}
+.cw-x{margin-left:auto;background:transparent;border:none;color:#fff;font-size:1rem;cursor:pointer;opacity:.8}
+.cw-x:hover{opacity:1}
+#cw-msgs{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth}
+#cw-msgs::-webkit-scrollbar{width:2px}
+#cw-msgs::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+.cm{max-width:88%}.cm.bot{align-self:flex-start}.cm.usr{align-self:flex-end}
+.cb{padding:7px 10px;border-radius:11px;font-size:.77rem;line-height:1.6}
+.cm.bot .cb{background:#f0f2f5;border:1px solid var(--bdr);border-bottom-left-radius:3px;color:var(--txt)}
+.cm.usr .cb{background:linear-gradient(135deg,#7c5cfc,#5b3fe8);color:#fff;border-bottom-right-radius:3px}
+.ct{font-size:.56rem;color:var(--muted);margin-top:2px}.cm.usr .ct{text-align:right}
+#cw-qr{padding:5px 8px;display:flex;gap:4px;flex-wrap:wrap;border-top:1px solid var(--bdr)}
+.cqb{background:#f0f2f5;border:1px solid var(--bdr);color:var(--muted);padding:2px 7px;border-radius:100px;font-size:.62rem;cursor:pointer;transition:all .15s;font-family:'Space Mono',monospace}
+.cqb:hover{border-color:var(--accent);color:var(--accent)}
+#cw-ir{padding:7px 9px;border-top:1px solid var(--bdr);display:flex;gap:5px;align-items:center}
+#cw-inp{flex:1;background:#f0f2f5;border:1.5px solid var(--bdr);color:var(--txt);padding:6px 9px;border-radius:7px;font-size:.75rem;font-family:'Sora',sans-serif;outline:none;transition:border-color .2s}
+#cw-inp:focus{border-color:var(--accent)}
+#cw-inp::placeholder{color:#9ca3af}
+#cw-send{width:29px;height:29px;border-radius:7px;border:none;background:linear-gradient(135deg,#7c5cfc,#5b3fe8);color:#fff;font-size:.82rem;cursor:pointer;flex-shrink:0;transition:all .2s}
+#cw-send:hover{transform:scale(1.08)}
+.cdots{display:flex;gap:3px;align-items:center;padding:3px 0}
+.cdots span{width:4px;height:4px;border-radius:50%;background:#9ca3af;animation:cd .8s ease infinite}
+.cdots span:nth-child(2){animation-delay:.15s}.cdots span:nth-child(3){animation-delay:.3s}
+@keyframes cd{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+/* TOAST */
+#toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--txt);color:#fff;border-radius:9px;padding:7px 16px;font-size:.78rem;box-shadow:0 4px 18px rgba(0,0,0,.2);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:480px){
+  #chat-win{width:calc(100vw - 32px);right:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- MAIN TOPBAR -->
+<div class="topbar">
+  <button class="back-btn" onclick="goBack()">← Back</button>
+  <div class="topbar-title">🎓 EduPocket Classroom</div>
+  <button class="ai-top-btn" onclick="openChat()">🤖 AI Chat</button>
+</div>
+
+<!-- HOME VIEW: ALL SUBJECTS -->
+<div id="home-view">
+  <div class="home-content">
+    <div class="search-wrap">
+      <input type="text" id="search-inp" placeholder="🔍 Search any subject…" oninput="filterSubjects(this.value)"/>
+    </div>
+    <div id="cat-list"></div>
+  </div>
+</div>
+
+<!-- SUBJECT VIEW -->
+<div id="subj-view">
+  <div class="subj-topbar">
+    <button class="subj-back" onclick="closeSubject()">← All Subjects</button>
+    <div class="subj-name-bar" id="subj-name-bar"></div>
+  </div>
+  <div class="subj-content" id="subj-content"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- AI CHAT FAB -->
+<button id="chat-fab" onclick="toggleChat()" title="AI Study Assistant">🤖</button>
+
+<!-- AI CHAT WINDOW -->
+<div id="chat-win">
+  <div class="cw-hdr">
+    <div class="cw-av">🤖</div>
+    <div><div class="cw-nm">EduPocket AI</div><div class="cw-st">● Online · Study Assistant</div></div>
+    <button class="cw-x" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="cw-msgs"></div>
+  <div id="cw-qr"></div>
+  <div id="cw-ir">
+    <input id="cw-inp" type="text" placeholder="Ask anything…" onkeydown="if(event.key==='Enter')cwSend()"/>
+    <button id="cw-send" onclick="cwSend()">➤</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  ALL SUBJECTS DATA
+//  Categories match your screenshot exactly
+// ══════════════════════════════════════════════════════
+var CATEGORIES = [
+  {
+    label:'💻 CS / IT Core', color:'#3b82f6',
+    subjects:[
+      {
+        id:'dsa', name:'Data Structures & Algorithms', icon:'🌲',
+        desc:'Arrays · Linked Lists · Trees · Graphs · Sorting · Dynamic Programming',
+        notes:[
+          {title:'Big-O Time Complexity',body:'O(1) Constant: Array access, hash map get\nO(log n) Log: Binary search, balanced BST\nO(n) Linear: Linear search, single loop\nO(n log n) Log-Linear: Merge sort, heap sort\nO(n²) Quadratic: Bubble/Selection/Insertion sort\nO(2ⁿ) Exponential: Recursive Fibonacci\n\n📌 Always analyse worst-case unless told otherwise'},
+          {title:'Sorting Algorithms',body:'Bubble Sort: compare adjacent, swap if wrong order — O(n²)\nSelection Sort: find min, place at front — O(n²)\nInsertion Sort: insert into sorted portion — O(n²), good for small/nearly-sorted\nMerge Sort: divide and conquer, stable — O(n log n)\nQuick Sort: pivot partition — O(n log n) avg, O(n²) worst\nHeap Sort: use max-heap — O(n log n), in-place\n\n📌 Best for large data: Merge Sort (stable) or Quick Sort (cache-friendly)'},
+          {title:'Trees & Graphs',body:'Binary Search Tree (BST): left < root < right\n  Search/Insert/Delete: O(log n) average, O(n) worst\n\nBalanced BST (AVL/Red-Black): always O(log n)\n\nGraph representations:\n  Adjacency Matrix: O(V²) space, O(1) edge check\n  Adjacency List: O(V+E) space, better for sparse\n\nGraph traversal:\n  BFS: level-order, uses Queue — shortest path (unweighted)\n  DFS: depth-first, uses Stack/Recursion — detect cycles\n\nShortest Path:\n  Dijkstra: weighted, non-negative edges — O((V+E) log V)\n  Bellman-Ford: handles negative edges — O(VE)'}
+        ],
+        videos:[
+          {title:'Data Structures Full Course',channel:'freeCodeCamp',duration:'8:02:23',url:'https://www.youtube.com/watch?v=RBSGKlAvoiM',tag:'Full Course'},
+          {title:'Algorithms and Data Structures',channel:'freeCodeCamp',duration:'5:22:09',url:'https://www.youtube.com/watch?v=8hly31xKli0',tag:'Algorithms'},
+          {title:'Dynamic Programming — Learn to Solve',channel:'freeCodeCamp',duration:'5:00:00',url:'https://www.youtube.com/watch?v=oBt53YbR9Kk',tag:'DP'},
+          {title:'Big O Notation — Full Guide',channel:'Web Dev Simplified',duration:'18:47',url:'https://www.youtube.com/watch?v=itn09C2ZB9Y',tag:'Complexity'},
+          {title:'Graph Algorithms for Technical Interviews',channel:'freeCodeCamp',duration:'2:13:42',url:'https://www.youtube.com/watch?v=tWVWeAqZ0WU',tag:'Graphs'},
+          {title:'Sorting Algorithms Visualised',channel:'CS Dojo',duration:'23:41',url:'https://www.youtube.com/watch?v=kPRA0W1kECg',tag:'Sorting'}
+        ],
+        iqs:[
+          {q:'What is the difference between BFS and DFS?',a:'BFS (Breadth-First Search):\n  Uses Queue (FIFO)\n  Explores level by level\n  Best for: shortest path (unweighted), level-order traversal\n  Time: O(V+E), Space: O(V)\n\nDFS (Depth-First Search):\n  Uses Stack/Recursion\n  Explores as deep as possible first\n  Best for: cycle detection, topological sort, connected components\n  Time: O(V+E), Space: O(V)'},
+          {q:'Explain Dynamic Programming with an example.',a:'DP = break problem into overlapping subproblems, store results (memoisation/tabulation)\n\nExample — Fibonacci:\n  Naive recursion: O(2ⁿ)\n  DP with memo: O(n) — store computed results\n\nConditions for DP:\n  1. Optimal substructure: optimal solution built from optimal sub-solutions\n  2. Overlapping subproblems: same subproblems solved repeatedly\n\nCommon DP problems: Knapsack, LCS, LIS, Coin Change, Matrix Chain'}
+        ]
+      },
+      {
+        id:'oop', name:'Object-Oriented Programming', icon:'🧱',
+        desc:'Classes · Inheritance · Polymorphism · Encapsulation · Abstraction',
+        notes:[
+          {title:'4 Pillars of OOP',body:'Encapsulation: Bundle data + methods, hide internal state\n  Access modifiers: private, protected, public\n\nAbstraction: Hide complexity, show only necessary interface\n  Abstract classes, interfaces\n\nInheritance: Child class inherits from parent\n  Code reuse, "is-a" relationship\n  Types: Single, Multiple (Python/C++), Multilevel, Hierarchical\n\nPolymorphism: Same interface, different behaviour\n  Compile-time: Method overloading (same name, diff params)\n  Run-time: Method overriding (child overrides parent)'},
+          {title:'SOLID Principles',body:'S — Single Responsibility: Each class has one job\nO — Open/Closed: Open for extension, closed for modification\nL — Liskov Substitution: Subtypes must be substitutable for base types\nI — Interface Segregation: No client should depend on unused methods\nD — Dependency Inversion: Depend on abstractions, not concretions\n\n📌 SOLID = write code that is maintainable and scalable'}
+        ],
+        videos:[
+          {title:'Object Oriented Programming — Full Course',channel:'freeCodeCamp',duration:'2:02:17',url:'https://www.youtube.com/watch?v=Ej_02ICOIgs',tag:'Full Course'},
+          {title:'OOP in Python — Full Course',channel:'Tech With Tim',duration:'1:48:00',url:'https://www.youtube.com/watch?v=JeznW_7DlB0',tag:'Python'},
+          {title:'SOLID Principles Explained',channel:'Web Dev Simplified',duration:'21:22',url:'https://www.youtube.com/watch?v=UQqY3_6Epbg',tag:'SOLID'},
+          {title:'Design Patterns — Full Course',channel:'freeCodeCamp',duration:'1:01:51',url:'https://www.youtube.com/watch?v=tv-_1er1mWI',tag:'Patterns'}
+        ],
+        iqs:[
+          {q:'What is polymorphism? Explain with an example.',a:'Polymorphism = same interface, different behaviour\n\nCompile-time (Method Overloading):\n  Same method name, different parameters\n  Resolved at compile time\n\nRun-time (Method Overriding):\n  Child class provides specific implementation of parent method\n  Resolved at runtime via virtual dispatch\n\nExample: Animal class has speak()\n  Dog.speak() → "Woof"\n  Cat.speak() → "Meow"\n  Same call, different result based on actual object type'}
+        ]
+      },
+      {
+        id:'os', name:'Operating Systems', icon:'⚙️',
+        desc:'Processes · Threads · Memory · Scheduling · File Systems · Deadlock',
+        notes:[
+          {title:'Process vs Thread',body:'Process:\n  Independent program in execution\n  Own memory space (code, data, heap, stack)\n  Isolated — crash doesn\'t affect others\n  IPC needed to communicate\n  Creation: expensive (fork())\n\nThread:\n  Lightweight unit within a process\n  Shares process memory (code, data, heap)\n  Own stack and registers\n  Fast creation and context switch\n  Risk: race conditions on shared data\n\n📌 Multi-process: isolation · Multi-thread: performance'},
+          {title:'CPU Scheduling Algorithms',body:'FCFS (First Come First Serve):\n  Simple, non-preemptive, convoy effect\n\nSJF (Shortest Job First):\n  Minimum avg waiting time, may starve long jobs\n\nRound Robin:\n  Time quantum, preemptive, fair\n  Good for time-sharing systems\n\nPriority Scheduling:\n  Higher priority runs first, starvation possible\n  Fix with aging (increase priority over time)\n\nMLFQ (Multi-Level Feedback Queue):\n  Multiple queues with different priorities\n  Most practical, used in real OS'},
+          {title:'Deadlock',body:'4 Conditions (ALL must hold):\n  1. Mutual Exclusion: resource held exclusively\n  2. Hold and Wait: holding resource while waiting for another\n  3. No Preemption: resources cannot be forcibly taken\n  4. Circular Wait: cycle of waiting processes\n\nPrevention: Eliminate one condition\nAvoidance: Banker\'s Algorithm\nDetection: Resource Allocation Graph\nRecovery: Terminate process or preempt resource\n\n📌 Deadlock vs Starvation:\n  Deadlock = no progress for all · Starvation = no progress for one'}
+        ],
+        videos:[
+          {title:'Operating Systems Full Course',channel:'Jenny\'s Lectures',duration:'Playlist',url:'https://www.youtube.com/watch?v=vBURTt97EkA',tag:'Full Course'},
+          {title:'OS Concepts — Neso Academy',channel:'Neso Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=mXw9ruZaxzQ',tag:'Concepts'},
+          {title:'Process Synchronization',channel:'Neso Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=ph2awKa8r5Y',tag:'Sync'},
+          {title:'CPU Scheduling Algorithms',channel:'Gate Smashers',duration:'Playlist',url:'https://www.youtube.com/watch?v=EWkQl0n0w5M',tag:'Scheduling'},
+          {title:'Memory Management & Paging',channel:'Neso Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=qlH4-oHnBb8',tag:'Memory'}
+        ],
+        iqs:[
+          {q:'Explain deadlock and its four necessary conditions.',a:'Deadlock: set of processes permanently blocked, each waiting for resource held by another.\n\n4 Conditions (ALL must hold simultaneously):\n1. Mutual Exclusion: resource used by one process at a time\n2. Hold and Wait: process holds resource while waiting for another\n3. No Preemption: resources released only voluntarily\n4. Circular Wait: P1→P2→P3→P1 cycle\n\nPrevention: deny one condition\nAvoidance: Banker\'s Algorithm (safe state)\nDetection + Recovery: find cycles, terminate/preempt'}
+        ]
+      },
+      {
+        id:'cn', name:'Computer Networks', icon:'🌐',
+        desc:'OSI Model · TCP/IP · DNS · HTTP · Routing · Protocols',
+        notes:[
+          {title:'OSI Model — 7 Layers',body:'7 — Application: HTTP, FTP, SMTP, DNS (user-facing)\n6 — Presentation: Encryption, compression, encoding\n5 — Session: Session management, authentication\n4 — Transport: TCP (reliable), UDP (fast) — port numbers\n3 — Network: IP addressing, routing — routers\n2 — Data Link: MAC addresses, frames — switches\n1 — Physical: Bits, cables, signals — hubs\n\n📌 Mnemonic (top→bottom): "All People Seem To Need Data Processing"\n   Mnemonic (bottom→top): "Please Do Not Throw Sausage Pizza Away"'},
+          {title:'TCP vs UDP',body:'TCP (Transmission Control Protocol):\n  Connection-oriented (3-way handshake: SYN→SYN-ACK→ACK)\n  Reliable: acknowledgements, retransmission\n  Ordered: sequence numbers\n  Flow control + congestion control\n  Slower due to overhead\n  Use: HTTP, email, file transfer, banking\n\nUDP (User Datagram Protocol):\n  Connectionless — fire and forget\n  No guarantees, no ordering\n  Fast, low overhead\n  Use: Video streaming, gaming, DNS, VoIP\n\n📌 Need reliability → TCP · Need speed → UDP'}
+        ],
+        videos:[
+          {title:'Computer Networks Full Course',channel:'freeCodeCamp',duration:'9:04:55',url:'https://www.youtube.com/watch?v=qiQR5rTSshw',tag:'Full Course'},
+          {title:'OSI Model Explained',channel:'Practical Networking',duration:'18:46',url:'https://www.youtube.com/watch?v=LANW3m7UgWs',tag:'OSI Model'},
+          {title:'TCP/IP and Networking Fundamentals',channel:'PowerCert',duration:'22:55',url:'https://www.youtube.com/watch?v=2Yggtx_yDOQ',tag:'TCP/IP'},
+          {title:'HTTP Crash Course',channel:'Traversy Media',duration:'38:14',url:'https://www.youtube.com/watch?v=iYM2zFP3Zn0',tag:'HTTP'},
+          {title:'DNS Explained in 100 Seconds',channel:'Fireship',duration:'2:06',url:'https://www.youtube.com/watch?v=UVR9lhUGAy0',tag:'DNS'}
+        ],
+        iqs:[
+          {q:'What is the difference between TCP and UDP?',a:'TCP: connection-oriented, reliable, ordered, flow control\n  Use: HTTP, SMTP, FTP, banking\n  3-way handshake: SYN → SYN-ACK → ACK\n\nUDP: connectionless, no guarantees, fast\n  Use: DNS, streaming, gaming, VoIP\n\nTCP = postal service (guaranteed delivery)\nUDP = radio broadcast (fast, no confirmation)'}
+        ]
+      },
+      {id:'dbms', name:'Database Management Systems', icon:'🗄️',
+        desc:'SQL · Normalization · Transactions · Indexing · NoSQL',
+        notes:[{title:'SQL Fundamentals',body:'DDL: CREATE, ALTER, DROP, TRUNCATE\nDML: SELECT, INSERT, UPDATE, DELETE\nDCL: GRANT, REVOKE\nTCL: COMMIT, ROLLBACK, SAVEPOINT\n\nJOINS:\n  INNER JOIN: matching rows both tables\n  LEFT JOIN: all left + matching right\n  RIGHT JOIN: all right + matching left\n  FULL OUTER: all rows both tables\n\nNormalization:\n  1NF: atomic values, no repeating groups\n  2NF: 1NF + no partial dependency\n  3NF: 2NF + no transitive dependency\n  BCNF: 3NF + every determinant is candidate key'},
+        {title:'ACID Properties',body:'Atomicity: transaction all-or-nothing\nConsistency: DB always valid state before and after\nIsolation: concurrent transactions don\'t interfere\nDurability: committed data survives failures\n\nIsolation Levels (low→high):\n  Read Uncommitted → Read Committed → Repeatable Read → Serializable\n\nIndexing:\n  B-Tree Index: default, range queries\n  Hash Index: exact match, O(1)\n  Clustered: data sorted by index key (one per table)\n  Non-clustered: separate structure, multiple allowed'}],
+        videos:[
+          {title:'Database Management Systems — Full Course',channel:'freeCodeCamp',duration:'4:20:17',url:'https://www.youtube.com/watch?v=HXV3zeQKqGY',tag:'Full Course'},
+          {title:'SQL Tutorial — Full Database Course',channel:'freeCodeCamp',duration:'4:20:17',url:'https://www.youtube.com/watch?v=HXV3zeQKqGY',tag:'SQL'},
+          {title:'Normalization — 1NF 2NF 3NF BCNF',channel:'Neso Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=UrYLYV7WSHM',tag:'Normalization'},
+          {title:'Indexing in Databases',channel:'Hussein Nasser',duration:'31:12',url:'https://www.youtube.com/watch?v=-qNSXK7s7_w',tag:'Indexing'}
+        ],
+        iqs:[{q:'Explain ACID properties in databases.',a:'Atomicity: all operations in transaction succeed or all fail (no partial updates)\nConsistency: transaction moves DB from one valid state to another\nIsolation: concurrent transactions execute as if sequential\nDurability: committed transactions persist even after system failure\n\nImplemented via: Write-Ahead Logging (WAL), locking, MVCC'}]
+      },
+      {id:'se', name:'Software Engineering', icon:'🛠️',
+        desc:'SDLC · Agile · Testing · Design Patterns · UML',
+        notes:[{title:'SDLC Models',body:'Waterfall: Sequential phases — requirements→design→code→test→deploy\n  Pros: Simple, documented · Cons: Rigid, late feedback\n\nAgile/Scrum:\n  Sprints (2-4 weeks), daily standups, retrospectives\n  Roles: Product Owner, Scrum Master, Dev Team\n  Pros: Flexible, continuous feedback · Cons: Hard to scale\n\nSpiral: Risk-driven, iterative planning\nV-Model: Verification and validation at each stage\n\n📌 Agile used in most modern software development'}],
+        videos:[
+          {title:'Software Engineering Full Course',channel:'Simplilearn',duration:'4:07:42',url:'https://www.youtube.com/watch?v=WFbEkHgMgFY',tag:'Full Course'},
+          {title:'Agile Methodology Explained',channel:'Simplilearn',duration:'15:04',url:'https://www.youtube.com/watch?v=8eVXTyIZ1Hs',tag:'Agile'},
+          {title:'Design Patterns in Object Oriented Programming',channel:'freeCodeCamp',duration:'1:01:51',url:'https://www.youtube.com/watch?v=tv-_1er1mWI',tag:'Patterns'}
+        ],
+        iqs:[{q:'What is Agile methodology and how does Scrum work?',a:'Agile: iterative, incremental development with continuous feedback\n\nScrum framework:\n  Sprint: 2-4 week iteration\n  Ceremonies: Sprint Planning → Daily Standup → Sprint Review → Retrospective\n  Artifacts: Product Backlog, Sprint Backlog, Increment\n  Roles: Product Owner (what), Scrum Master (how), Dev Team (build)\n\nAgile values: individuals > processes · working software > documentation · collaboration > contracts · responding to change > following plan'}]
+      },
+      {id:'ca', name:'Computer Architecture', icon:'🔧',
+        desc:'CPU · Memory Hierarchy · Pipelining · Cache · Instruction Sets',
+        notes:[{title:'CPU Architecture',body:'Components: ALU, CU, Registers, Cache\n\nInstruction Cycle (Fetch-Decode-Execute):\n  1. Fetch: get instruction from memory (PC points to it)\n  2. Decode: CU interprets instruction\n  3. Execute: ALU performs operation\n  4. Write-back: result stored in register/memory\n\nPipelining: overlap multiple instruction stages\n  Hazards: Data (dependency), Control (branch), Structural (resource conflict)\n\nMemory Hierarchy (fast→slow, small→large):\n  Registers → L1 Cache → L2 Cache → L3 Cache → RAM → SSD → HDD'},
+        {title:'Cache Memory',body:'Cache: small, fast memory between CPU and RAM\n\nMapping Techniques:\n  Direct Mapped: each block → one cache location (simple, conflict misses)\n  Fully Associative: block → any location (flexible, expensive)\n  Set-Associative: hybrid (most used, balance)\n\nReplacement Policies:\n  LRU (Least Recently Used): best performance\n  FIFO: simple, worse performance\n  Random: simple approximation\n\nWrite Policies:\n  Write-Through: write to cache AND memory simultaneously (consistent)\n  Write-Back: write to cache only, flush later (faster)'}],
+        videos:[
+          {title:'Computer Architecture Full Course',channel:'freeCodeCamp',duration:'4:33:44',url:'https://www.youtube.com/watch?v=tpIctyqH29Q',tag:'Full Course'},
+          {title:'CPU Design & Pipelining',channel:'Neso Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=FZGugFqdr60',tag:'CPU'},
+          {title:'Cache Memory Explained',channel:'Computerphile',duration:'10:00',url:'https://www.youtube.com/watch?v=yi0FhRqDJfo',tag:'Cache'}
+        ],
+        iqs:[{q:'What is pipelining and what hazards can occur?',a:'Pipelining: overlapping multiple instruction stages (Fetch, Decode, Execute, Write-back)\nImproves throughput without reducing individual instruction latency\n\nHazards:\nData Hazard: instruction depends on result of previous not yet complete\n  Fix: forwarding, stalling (NOP insertion)\nControl Hazard: branch outcome unknown\n  Fix: branch prediction, delayed branching\nStructural Hazard: two instructions need same hardware resource\n  Fix: duplicate resources, stalling'}]
+      },
+      {id:'toc', name:'Theory of Computation', icon:'🔄',
+        desc:'Automata · Languages · Turing Machines · Complexity',
+        notes:[{title:'Automata & Languages',body:'Regular Languages: recognized by Finite Automata (DFA/NFA)\n  Described by: Regular Expressions\n  Closed under: union, concatenation, star\n\nContext-Free Languages: recognized by Pushdown Automata\n  Described by: Context-Free Grammars (CFG)\n  Example: balanced parentheses, palindromes\n\nRecursively Enumerable: recognized by Turing Machines\n\nChomsky Hierarchy:\n  Type 0: RE (Turing Machine)\n  Type 1: Context-Sensitive\n  Type 2: Context-Free (PDA)\n  Type 3: Regular (DFA/NFA)\n\nP vs NP:\n  P: solvable in polynomial time\n  NP: verifiable in polynomial time\n  NP-Complete: hardest in NP (SAT, TSP, Knapsack)'}],
+        videos:[
+          {title:'Theory of Computation Full Course',channel:'Neso Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=58N2N7zJGrQ',tag:'Full Course'},
+          {title:'Automata Theory — DFA, NFA, PDA',channel:'Gate Smashers',duration:'Playlist',url:'https://www.youtube.com/watch?v=Qa6csfkK7_I',tag:'Automata'},
+          {title:'Turing Machines Explained',channel:'Computerphile',duration:'14:14',url:'https://www.youtube.com/watch?v=dNRDvLACg5Q',tag:'Turing Machine'}
+        ],
+        iqs:[{q:'Explain P vs NP problem.',a:'P: problems solvable in polynomial time O(nᵏ)\n  Example: Sorting, Shortest Path\n\nNP: problems where a given solution can be VERIFIED in polynomial time\n  Example: TSP (verify tour length), SAT (verify assignment)\n\nNP-Hard: at least as hard as hardest NP problems\nNP-Complete: in NP AND NP-Hard\n\nP = NP? Open problem — worth $1 million (Millennium Prize)\nMost believe P ≠ NP'}]
+      },
+      {id:'cd', name:'Compiler Design', icon:'📝',
+        desc:'Lexical Analysis · Parsing · Semantic Analysis · Code Generation',
+        notes:[{title:'Compiler Phases',body:'1. Lexical Analysis (Scanner): source code → tokens\n   Tools: Lex/Flex\n\n2. Syntax Analysis (Parser): tokens → Parse Tree (using CFG)\n   Types: LL(1) top-down, LR(1) bottom-up\n   Tools: Yacc/Bison\n\n3. Semantic Analysis: type checking, scope resolution\n\n4. Intermediate Code Generation: three-address code\n\n5. Code Optimization: improve efficiency\n   Peephole, loop optimization, constant folding\n\n6. Code Generation: intermediate → target machine code\n\n7. Symbol Table: stores identifier information throughout'}],
+        videos:[
+          {title:'Compiler Design Full Course',channel:'Neso Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=Qkwj65l_96I',tag:'Full Course'},
+          {title:'Compiler Design — Gate Smashers',channel:'Gate Smashers',duration:'Playlist',url:'https://www.youtube.com/watch?v=MKLSEiGH-5c',tag:'GATE Prep'}
+        ],
+        iqs:[{q:'Explain the phases of a compiler.',a:'1. Lexical Analysis: tokens (keywords, identifiers, operators)\n2. Syntax Analysis: parse tree using grammar rules (CFG)\n3. Semantic Analysis: type checking, undeclared variables\n4. Intermediate Code: platform-independent (3-address code)\n5. Optimization: remove redundancy, loop optimization\n6. Code Generation: target assembly/machine code\n\nFront-end: phases 1-3 (machine-independent)\nBack-end: phases 4-6 (machine-dependent)'}]
+      },
+      {id:'dm', name:'Discrete Mathematics', icon:'📐',
+        desc:'Logic · Sets · Graph Theory · Combinatorics · Proof Techniques',
+        notes:[{title:'Logic & Proof',body:'Propositional Logic: P → Q, P ∧ Q, P ∨ Q, ¬P\nImplication (P→Q): false ONLY when P=T and Q=F\nBiconditional (P↔Q): true when both same\n\nProof Techniques:\n  Direct: assume P, prove Q\n  Contrapositive: prove ¬Q → ¬P\n  Contradiction: assume ¬P, derive contradiction\n  Induction: base case + inductive step\n\nSets: union ∪, intersection ∩, difference -, complement\nDe Morgan\'s Laws:\n  ¬(A ∧ B) = ¬A ∨ ¬B\n  ¬(A ∨ B) = ¬A ∧ ¬B'}],
+        videos:[
+          {title:'Discrete Mathematics Full Course',channel:'freeCodeCamp',duration:'9:32:32',url:'https://www.youtube.com/watch?v=A3Ffwsnad0k',tag:'Full Course'},
+          {title:'Graph Theory Full Course',channel:'freeCodeCamp',duration:'7:12:39',url:'https://www.youtube.com/watch?v=LFKZLXVO-Dg',tag:'Graph Theory'},
+          {title:'Combinatorics & Probability',channel:'Khan Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=iKy-d5_erhI',tag:'Combinatorics'}
+        ],
+        iqs:[{q:'Explain proof by mathematical induction.',a:'Mathematical Induction — prove P(n) for all n ≥ base:\n\nStep 1 — Base Case: prove P(1) (or P(0)) is true\nStep 2 — Inductive Hypothesis: assume P(k) is true for some k\nStep 3 — Inductive Step: prove P(k+1) is true using P(k)\n\nExample: Prove 1+2+…+n = n(n+1)/2\nBase: n=1 → 1 = 1(2)/2 = 1 ✓\nAssume: 1+…+k = k(k+1)/2\nShow: 1+…+k+(k+1) = (k+1)(k+2)/2 ✓'}]
+      }
+    ]
+  },
+  {
+    label:'🤖 AI / ML / Data Science', color:'#8b5cf6',
+    subjects:[
+      {id:'ai', name:'Artificial Intelligence', icon:'🧠',
+        desc:'Search · Knowledge Representation · Planning · Expert Systems · Ethics',
+        notes:[{title:'AI Search Algorithms',body:'Uninformed Search:\n  BFS: complete, optimal (unit cost), O(bᵈ)\n  DFS: not complete, not optimal, O(bᵐ) space efficient\n  Iterative Deepening: DFS + BFS benefits\n  UCS: optimal for non-uniform costs\n\nInformed Search (uses heuristic h(n)):\n  Greedy Best-First: expands node with lowest h(n)\n  A*: f(n) = g(n) + h(n), optimal if h is admissible\n  Admissible heuristic: never overestimates actual cost\n\nLocal Search:\n  Hill Climbing: greedy, gets stuck in local maxima\n  Simulated Annealing: allows bad moves with decreasing probability\n  Genetic Algorithms: evolutionary, population-based'}],
+        videos:[
+          {title:'Artificial Intelligence Full Course',channel:'Simplilearn',duration:'7:08:55',url:'https://www.youtube.com/watch?v=JMUxmLyrhSk',tag:'Full Course'},
+          {title:'AI for Everyone — Andrew Ng',channel:'DeepLearning.AI',duration:'Course',url:'https://www.youtube.com/watch?v=reUZRyXxUs4',tag:'Beginner'},
+          {title:'Search Algorithms in AI',channel:'Computerphile',duration:'Playlist',url:'https://www.youtube.com/watch?v=oDqjPvD1go',tag:'Search'}
+        ],
+        iqs:[{q:'Explain A* search algorithm.',a:'A* uses f(n) = g(n) + h(n)\n  g(n) = actual cost from start to n\n  h(n) = heuristic estimate from n to goal\n\nOptimal if h is admissible (never overestimates)\nComplete if no infinite cost paths\n\nBetter than Dijkstra: uses heuristic to guide search\nBetter than Greedy: uses actual cost + heuristic\n\nExample heuristic: Manhattan distance in grid search'}]
+      },
+      {id:'ml', name:'Machine Learning', icon:'🤖',
+        desc:'Supervised · Unsupervised · Deep Learning · Evaluation · Algorithms',
+        notes:[
+          {title:'Types of Machine Learning',body:'Supervised: labelled data — Classification, Regression\nUnsupervised: no labels — Clustering, Dimensionality Reduction\nReinforcement: reward/penalty — AlphaGo, robotics\n\nAlgorithms:\n  Linear Regression: predict continuous values\n  Logistic Regression: binary classification\n  Decision Tree: if-else splits\n  Random Forest: bagging of trees\n  SVM: maximize margin hyperplane\n  k-NN: classify by k nearest neighbours\n  k-Means: cluster by centroid distance'},
+          {title:'Bias-Variance & Evaluation',body:'Bias = underfitting (model too simple)\nVariance = overfitting (model too complex)\n\nMetrics:\n  Precision = TP/(TP+FP) — quality\n  Recall = TP/(TP+FN) — coverage\n  F1 = harmonic mean of P & R\n  ROC-AUC: area under TPR vs FPR curve\n\n📌 Imbalanced data → use F1/AUC, NOT accuracy'}
+        ],
+        videos:[
+          {title:'Machine Learning Full Course',channel:'edureka!',duration:'6:54:06',url:'https://www.youtube.com/watch?v=GwIo3gDZCVQ',tag:'Full Course'},
+          {title:'Neural Networks — 3Blue1Brown',channel:'3Blue1Brown',duration:'19:13',url:'https://www.youtube.com/watch?v=aircAruvnKk',tag:'Deep Learning'},
+          {title:'StatQuest: ML Fundamentals',channel:'StatQuest',duration:'Playlist',url:'https://www.youtube.com/watch?v=Gv9_4yMHFhI',tag:'Intuition'},
+          {title:'Scikit-Learn Crash Course',channel:'Tech With Tim',duration:'2:13:27',url:'https://www.youtube.com/watch?v=0B5eIE_1vpU',tag:'Practical'},
+          {title:'Gradient Descent Explained',channel:'StatQuest',duration:'24:43',url:'https://www.youtube.com/watch?v=sDv4f4s2SB8',tag:'Gradient Descent'}
+        ],
+        iqs:[{q:'Explain overfitting and how to fix it.',a:'Overfitting: model memorises training data, fails on new data\nSigns: low training error, HIGH validation error\n\nFixes:\n• More training data\n• Regularisation: L1 (Lasso) or L2 (Ridge)\n• Dropout (neural networks)\n• Cross-validation\n• Simpler model\n• Early stopping\n• Ensemble methods (Random Forest)'}]
+      },
+      {id:'dl', name:'Deep Learning', icon:'🧬',
+        desc:'Neural Networks · CNNs · RNNs · Transformers · GANs · PyTorch',
+        notes:[{title:'Neural Network Fundamentals',body:'Neuron: weighted sum of inputs → activation function → output\nActivation Functions:\n  ReLU: max(0,x) — default, no vanishing gradient\n  Sigmoid: (0,1) — binary output\n  Softmax: probability distribution — multi-class output\n  Tanh: (-1,1) — zero-centred\n\nBackpropagation: chain rule to compute gradients layer by layer\nOptimisers: SGD, Adam (most popular), RMSProp\n\nCNN: Convolutional layers for images (spatial features)\nRNN/LSTM: sequential data (text, time series)\nTransformer: attention mechanism — BERT, GPT'}],
+        videos:[
+          {title:'Deep Learning Full Course',channel:'freeCodeCamp',duration:'6:01:54',url:'https://www.youtube.com/watch?v=VyWAvY2CF9c',tag:'Full Course'},
+          {title:'PyTorch for Deep Learning — Full Course',channel:'freeCodeCamp',duration:'25:37:26',url:'https://www.youtube.com/watch?v=V_xro1bcAuA',tag:'PyTorch'},
+          {title:'CNNs Explained — 3Blue1Brown',channel:'3Blue1Brown',duration:'Playlist',url:'https://www.youtube.com/watch?v=aircAruvnKk',tag:'CNN'},
+          {title:'Transformers from Scratch',channel:'Andrej Karpathy',duration:'1:56:20',url:'https://www.youtube.com/watch?v=kCc8FmEb1nY',tag:'Transformers'}
+        ],
+        iqs:[{q:'Explain the transformer architecture.',a:'Transformer: attention-based architecture (no recurrence)\n\nKey components:\n  Self-Attention: each token attends to all others\n  Multi-Head Attention: multiple attention in parallel\n  Positional Encoding: inject sequence position info\n  Feed-Forward: dense layer after attention\n  Layer Norm + Residual connections\n\nEncoder: understanding (BERT)\nDecoder: generation (GPT)\nEncoder-Decoder: translation (T5, original Transformer)\n\nAdvantage over RNN: parallel training, long-range dependencies'}]
+      },
+      {id:'ds', name:'Data Science', icon:'📊',
+        desc:'EDA · Statistics · Feature Engineering · Model Deployment · Case Studies',
+        notes:[{title:'Data Science Workflow',body:'1. Problem Definition: business question → ML framing\n2. Data Collection: databases, APIs, web scraping\n3. EDA: understand distributions, correlations, anomalies\n4. Preprocessing: handle nulls, encode, scale\n5. Feature Engineering: create meaningful features\n6. Modelling: train, validate, tune hyperparameters\n7. Evaluation: test set metrics, business impact\n8. Deployment: REST API (Flask/FastAPI), monitoring\n\n📌 80% of data science is data cleaning and EDA!'}],
+        videos:[
+          {title:'Data Science Full Course',channel:'freeCodeCamp',duration:'10:11:51',url:'https://www.youtube.com/watch?v=r-uOLxNrNk8',tag:'Full Course'},
+          {title:'Ken Jee — Data Science Projects',channel:'Ken Jee',duration:'Playlist',url:'https://www.youtube.com/watch?v=xi0vhXFPegw',tag:'Projects'},
+          {title:'Statistics for Data Science',channel:'StatQuest',duration:'Playlist',url:'https://www.youtube.com/watch?v=qBigTkBLU6g',tag:'Statistics'}
+        ],
+        iqs:[{q:'Explain the complete data science project workflow.',a:'1. Problem Definition: what question are we answering?\n2. Data Collection: gather relevant data\n3. EDA: distributions, correlations, missing values\n4. Preprocessing: clean, encode, scale\n5. Feature Engineering: domain-driven feature creation\n6. Model Selection + Training: baseline → tuned model\n7. Evaluation: test metrics (F1, RMSE, etc.)\n8. Deployment: REST API, monitoring, retraining\n9. Communication: insights to stakeholders\n\n📌 Document every decision — reproducibility matters!'}]
+      },
+      {id:'nlp', name:'Natural Language Processing', icon:'💬',
+        desc:'Tokenization · Embeddings · Transformers · BERT · GPT · Sentiment Analysis',
+        notes:[{title:'NLP Pipeline',body:'1. Text Preprocessing:\n   Tokenization, lowercasing, stop-word removal\n   Stemming (chop suffix) vs Lemmatization (base form)\n\n2. Feature Representation:\n   Bag of Words: word frequency (no order)\n   TF-IDF: term frequency × inverse document frequency\n   Word2Vec: dense embeddings (similar words → similar vectors)\n   BERT embeddings: contextual, bidirectional\n\n3. Tasks:\n   Classification: sentiment, spam, topic\n   NER: named entity recognition\n   Machine Translation: seq2seq\n   Question Answering: BERT fine-tuning\n   Text Generation: GPT family'}],
+        videos:[
+          {title:'NLP with Python Full Course',channel:'freeCodeCamp',duration:'8:48:55',url:'https://www.youtube.com/watch?v=X2vAabgKiuM',tag:'Full Course'},
+          {title:'Hugging Face Transformers Course',channel:'Hugging Face',duration:'Playlist',url:'https://www.youtube.com/watch?v=00GKzGyWFEs',tag:'Transformers'},
+          {title:'BERT Explained',channel:'Computerphile',duration:'12:45',url:'https://www.youtube.com/watch?v=-9vVhYEXeyQ',tag:'BERT'}
+        ],
+        iqs:[{q:'What is TF-IDF and how is it used?',a:'TF-IDF = Term Frequency × Inverse Document Frequency\n\nTF(t,d) = count of term t in document d / total terms in d\nIDF(t) = log(total documents / documents containing t)\n\nHigh TF-IDF: word frequent in doc but rare overall → important to that doc\nLow TF-IDF: common word (stop words like "the") → not distinctive\n\nUse cases: document ranking (search engines), feature extraction, keyword extraction'}]
+      },
+      {id:'cv', name:'Computer Vision', icon:'👁️',
+        desc:'Image Classification · Object Detection · Segmentation · CNNs · OpenCV',
+        notes:[{title:'Computer Vision Tasks',body:'Image Classification: what is in the image?\n  CNNs: LeNet → AlexNet → VGG → ResNet → EfficientNet\n\nObject Detection: where and what?\n  R-CNN → Fast R-CNN → Faster R-CNN → YOLO (real-time)\n  YOLO: single-pass, divides into grid, predicts bboxes + classes\n\nSemantic Segmentation: pixel-level class labels\n  FCN, U-Net (medical imaging)\n\nInstance Segmentation: detect + segment each object\n  Mask R-CNN\n\nKey CNN concepts:\n  Convolution: feature extraction\n  Pooling: spatial downsampling\n  Batch Norm: training stability\n  Skip connections: ResNet — solve vanishing gradient'}],
+        videos:[
+          {title:'Computer Vision Full Course',channel:'freeCodeCamp',duration:'3:46:45',url:'https://www.youtube.com/watch?v=oXlwWbU8l2o',tag:'Full Course'},
+          {title:'YOLO Object Detection Explained',channel:'Computerphile',duration:'11:23',url:'https://www.youtube.com/watch?v=ag3DLKsl2vk',tag:'YOLO'},
+          {title:'OpenCV Python Tutorial',channel:"Murtaza's Workshop",duration:'3:00:36',url:'https://www.youtube.com/watch?v=WQeoO7MI0Bs',tag:'OpenCV'}
+        ],
+        iqs:[{q:'How does YOLO work for object detection?',a:'YOLO (You Only Look Once): single-pass detector\n\n1. Divide image into S×S grid\n2. Each cell predicts B bounding boxes + confidence + C class probs\n3. Confidence = Pr(Object) × IoU(pred, truth)\n4. NMS (Non-Max Suppression) removes duplicate boxes\n\nAdvantage: very fast (real-time), single forward pass\nvs R-CNN: YOLO is 1000× faster but less accurate on small objects\n\nVersions: YOLOv1→v8, improving accuracy and speed'}]
+      },
+      {id:'rl', name:'Reinforcement Learning', icon:'🎮',
+        desc:'MDP · Q-Learning · Policy Gradient · DQN · PPO',
+        notes:[{title:'RL Fundamentals',body:'Key components:\n  Agent: learner/decision maker\n  Environment: what agent interacts with\n  State (s): current situation\n  Action (a): agent\'s choice\n  Reward (r): feedback signal\n  Policy π: mapping state → action\n\nGoal: maximise cumulative discounted reward\n  Gₜ = Σ γᵏ × rₜ₊ₖ₊₁ (γ = discount factor 0-1)\n\nQ-Learning: off-policy, learn Q(s,a) = expected future reward\n  Q(s,a) ← Q(s,a) + α[r + γ max Q(s\',a\') - Q(s,a)]\n\nDQN: Deep Q-Network, uses neural net to approximate Q\nPPO: Proximal Policy Optimization — used in ChatGPT RLHF'}],
+        videos:[
+          {title:'Reinforcement Learning Full Course',channel:'freeCodeCamp',duration:'2:25:09',url:'https://www.youtube.com/watch?v=ELE2_Mftqoc',tag:'Full Course'},
+          {title:'Q-Learning Explained Simply',channel:'deeplizard',duration:'Playlist',url:'https://www.youtube.com/watch?v=qhRNvCVVJaA',tag:'Q-Learning'},
+          {title:'Deep RL by Andrej Karpathy',channel:'Andrej Karpathy',duration:'1:30:00',url:'https://www.youtube.com/watch?v=l-mYLq6eZPY',tag:'Deep RL'}
+        ],
+        iqs:[{q:'Explain Q-Learning algorithm.',a:'Q-Learning: model-free, off-policy RL algorithm\n\nQ-table: stores Q(s,a) = expected future reward for each state-action pair\n\nUpdate rule:\nQ(s,a) ← Q(s,a) + α[r + γ·max Q(s\',a\') - Q(s,a)]\n  α = learning rate · γ = discount factor\n  r + γ·max Q(s\',a\') = target (Bellman equation)\n\nProcess:\n1. Start with Q-table all zeros\n2. Take action ε-greedy (explore/exploit)\n3. Observe reward + new state\n4. Update Q value\n5. Repeat until convergence\n\nDQN: replace Q-table with neural network for large state spaces'}]
+      },
+      {id:'bda', name:'Big Data Analytics', icon:'🌊',
+        desc:'Hadoop · Spark · MapReduce · Data Warehousing · Stream Processing',
+        notes:[{title:'Big Data Fundamentals',body:'5 Vs of Big Data:\n  Volume: terabytes to petabytes\n  Velocity: real-time/near-real-time generation\n  Variety: structured, semi-structured, unstructured\n  Veracity: data quality and uncertainty\n  Value: business insights from data\n\nHadoop Ecosystem:\n  HDFS: distributed file system (blocks replicated 3×)\n  MapReduce: parallel processing (Map → Shuffle → Reduce)\n  YARN: resource management\n  Hive: SQL-like queries on HDFS\n  HBase: NoSQL on Hadoop\n\nApache Spark:\n  In-memory processing (100× faster than MapReduce)\n  RDDs → DataFrames → Datasets\n  Streaming: structured streaming\n  MLlib: machine learning at scale'}],
+        videos:[
+          {title:'Big Data Full Course',channel:'edureka!',duration:'9:47:02',url:'https://www.youtube.com/watch?v=KCEPoPJ8sWw',tag:'Full Course'},
+          {title:'Apache Spark Tutorial',channel:'freeCodeCamp',duration:'2:27:19',url:'https://www.youtube.com/watch?v=_C8kWso4ne4',tag:'Spark'},
+          {title:'Hadoop Tutorial for Beginners',channel:'edureka!',duration:'4:49:17',url:'https://www.youtube.com/watch?v=1vbXmCrkT3Y',tag:'Hadoop'}
+        ],
+        iqs:[{q:'Compare Hadoop MapReduce vs Apache Spark.',a:'MapReduce:\n  Disk-based: reads/writes HDFS each step\n  Fault tolerant: recompute from HDFS\n  Batch processing only\n  Slower: disk I/O bottleneck\n  Language: Java primarily\n\nApache Spark:\n  In-memory: keeps data in RAM (100× faster)\n  RDD lineage: recompute from DAG\n  Batch + Streaming + ML + SQL\n  Faster but needs more memory\n  Languages: Python, Scala, Java, R\n\nWhen to use:\n  MapReduce: very large data, limited RAM, mature pipeline\n  Spark: speed matters, iterative ML, streaming'}]
+      },
+      {id:'dm', name:'Data Mining', icon:'⛏️',
+        desc:'Association Rules · Clustering · Classification · Anomaly Detection',
+        notes:[{title:'Data Mining Techniques',body:'Association Rule Mining:\n  Find items that frequently occur together\n  Apriori: support → frequent itemsets → rules\n  Support = P(A∩B), Confidence = P(B|A), Lift = Confidence/P(B)\n  Example: {bread, butter} → {milk}\n\nClustering:\n  k-Means: assign to nearest centroid, recompute centroids\n  DBSCAN: density-based, finds arbitrary shapes, handles outliers\n  Hierarchical: dendrogram, agglomerative (bottom-up)\n\nAnomaly Detection:\n  Statistical: z-score > 3 = outlier\n  Isolation Forest: anomalies are easier to isolate\n  Autoencoders: high reconstruction error = anomaly'}],
+        videos:[
+          {title:'Data Mining Full Course',channel:'Simplilearn',duration:'4:33:43',url:'https://www.youtube.com/watch?v=rZZDPFotjbk',tag:'Full Course'},
+          {title:'Association Rule Mining — Apriori',channel:'Simplilearn',duration:'32:48',url:'https://www.youtube.com/watch?v=WGlMlS_Yydk',tag:'Apriori'},
+          {title:'Clustering Algorithms Explained',channel:'StatQuest',duration:'20:01',url:'https://www.youtube.com/watch?v=4b5d3muPQmA',tag:'Clustering'}
+        ],
+        iqs:[{q:'Explain Apriori algorithm for association rules.',a:'Apriori: find frequent itemsets then generate association rules\n\nKey metrics:\n  Support(A) = transactions containing A / total transactions\n  Confidence(A→B) = Support(A∪B) / Support(A)\n  Lift(A→B) = Confidence(A→B) / Support(B)\n    Lift > 1: positive association · Lift = 1: independent\n\nAlgorithm:\n1. Find all frequent 1-itemsets (support ≥ min_support)\n2. Generate candidate 2-itemsets from frequent 1-itemsets\n3. Prune: if any subset is infrequent → remove\n4. Repeat until no new frequent itemsets\n5. Generate rules with confidence ≥ min_confidence\n\nApriori property: any subset of frequent itemset is frequent'}]
+      }
+    ]
+  },
+  {
+    label:'🔒 Systems & Security', color:'#ef4444',
+    subjects:[
+      {id:'cyber', name:'Cybersecurity', icon:'🛡️',
+        desc:'Threats · Vulnerabilities · Incident Response · Ethical Hacking · SOC',
+        notes:[{title:'Security Fundamentals',body:'CIA Triad:\n  Confidentiality: only authorised access\n  Integrity: data not tampered\n  Availability: accessible when needed\n\nThreat Categories:\n  Malware: virus, worm, trojan, ransomware, spyware\n  Social Engineering: phishing, spear-phishing, vishing\n  Network Attacks: DDoS, MITM, packet sniffing\n  Web Attacks: SQLi, XSS, CSRF\n\nSecurity Controls:\n  Preventive: firewalls, encryption, access control\n  Detective: IDS, logging, monitoring\n  Corrective: incident response, backups, patches\n\n📌 Defence in Depth: multiple layers of security'}],
+        videos:[
+          {title:'Cybersecurity Full Course',channel:'freeCodeCamp',duration:'12:52:49',url:'https://www.youtube.com/watch?v=U_P23SqJaDc',tag:'Full Course'},
+          {title:'Ethical Hacking Full Course',channel:'freeCodeCamp',duration:'15:28:22',url:'https://www.youtube.com/watch?v=3Kq1MIfTWCE',tag:'Ethical Hacking'},
+          {title:'CompTIA Security+ Full Course',channel:'Professor Messer',duration:'Playlist',url:'https://www.youtube.com/watch?v=9NE33fpQuw8',tag:'Security+'}
+        ],
+        iqs:[{q:'What is the CIA Triad and why is it important?',a:'CIA Triad = foundation of information security\n\nConfidentiality: prevent unauthorised disclosure\n  Controls: encryption, access control, RBAC\n  Threat: eavesdropping, data breach\n\nIntegrity: ensure data accuracy and completeness\n  Controls: hashing (SHA-256), digital signatures, audit logs\n  Threat: MITM, SQL injection, data tampering\n\nAvailability: ensure systems accessible when needed\n  Controls: redundancy, load balancing, DDoS protection\n  Threat: DDoS, ransomware, hardware failure\n\nEvery security decision maps to one or more CIA properties'}]
+      },
+      {id:'crypto', name:'Cryptography', icon:'🔑',
+        desc:'Symmetric · Asymmetric · Hashing · PKI · Digital Signatures · TLS',
+        notes:[{title:'Cryptography Fundamentals',body:'Symmetric (same key):\n  AES-128, AES-256 — fast, bulk data\n  Problem: key distribution\n\nAsymmetric (public + private key):\n  RSA-2048, ECC — slower, solves key distribution\n  Encrypt with public → decrypt with private\n  Sign with private → verify with public\n\nHashing (one-way):\n  SHA-256, SHA-3 — integrity\n  bcrypt, Argon2 — password hashing (slow by design)\n  MD5, SHA-1 — BROKEN (do not use)\n\nTLS Handshake:\n  1. ClientHello (cipher suites)\n  2. ServerHello + Certificate\n  3. Key exchange (ECDHE)\n  4. Finished (symmetric session key)'}],
+        videos:[
+          {title:'Cryptography Full Course',channel:'Simplilearn',duration:'3:47:37',url:'https://www.youtube.com/watch?v=AQDCe585Lnc',tag:'Full Course'},
+          {title:'How HTTPS Works',channel:'ByteByteGo',duration:'7:15',url:'https://www.youtube.com/watch?v=j9QmMEWmcfo',tag:'TLS/HTTPS'},
+          {title:'Public Key Cryptography — Computerphile',channel:'Computerphile',duration:'6:19',url:'https://www.youtube.com/watch?v=GSIDS_lvRv4',tag:'PKI'}
+        ],
+        iqs:[{q:'Explain how TLS/HTTPS works.',a:'TLS (Transport Layer Security) secures HTTP = HTTPS\n\nHandshake (simplified):\n1. Client sends ClientHello (TLS version, cipher suites)\n2. Server responds with certificate + ServerHello\n3. Client verifies certificate (chain of trust → CA)\n4. Key exchange: ECDHE generates shared session key\n5. Both switch to symmetric encryption (AES)\n\nWhy hybrid?\n  Asymmetric: slow, used only for key exchange\n  Symmetric: fast, used for actual data transfer\n\nCertificate: binds domain to public key, signed by trusted CA'}]
+      },
+      {id:'netsec', name:'Network Security', icon:'🌐',
+        desc:'Firewalls · IDS/IPS · VPN · Protocols · Penetration Testing',
+        notes:[{title:'Network Security Controls',body:'Firewalls:\n  Packet Filter: IP/port/protocol (stateless)\n  Stateful: tracks connection state\n  NGFW: deep packet inspection, app awareness, IPS\n\nIDS vs IPS:\n  IDS: passive, detects and alerts only\n  IPS: active, detects and BLOCKS\n\nVPN Types:\n  Site-to-Site: connect branch offices\n  Remote Access: work from home (OpenVPN, WireGuard)\n  Split Tunnel: only work traffic through VPN\n\nDMZ (Demilitarized Zone):\n  Buffer zone between internet and internal network\n  Public-facing servers (web, email, DNS) placed here\n\n📌 Layered security: Perimeter → Network → Host → Application'}],
+        videos:[
+          {title:'Network Security Full Course',channel:'freeCodeCamp',duration:'6:21:41',url:'https://www.youtube.com/watch?v=qiQR5rTSshw',tag:'Full Course'},
+          {title:'Penetration Testing with Kali Linux',channel:'NetworkChuck',duration:'Playlist',url:'https://www.youtube.com/watch?v=3Kq1MIfTWCE',tag:'Pen Testing'},
+          {title:'Wireshark Tutorial for Beginners',channel:'NetworkChuck',duration:'30:08',url:'https://www.youtube.com/watch?v=lb1Dw0elw0Q',tag:'Wireshark'}
+        ],
+        iqs:[{q:'What is a DMZ and why is it used?',a:'DMZ (Demilitarized Zone): network segment between internet and internal LAN\n\nPurpose: isolate public-facing servers from internal network\n\nTypical DMZ residents:\n  Web servers, email servers, DNS servers, FTP servers\n\nArchitecture:\n  Internet → Outer Firewall → DMZ → Inner Firewall → LAN\n\nBenefit: if web server is compromised, attacker cannot directly reach internal LAN — must bypass another firewall\n\nImplemented with two firewalls or a single firewall with 3 interfaces'}]
+      },
+      {id:'cloud2', name:'Cloud Computing', icon:'☁️',
+        desc:'IaaS · PaaS · SaaS · AWS · Azure · GCP · Scaling · Security',
+        notes:[
+          {title:'Service Models',body:'IaaS: manage OS up — EC2, Azure VM\nPaaS: manage app+data — Heroku, App Engine\nSaaS: just use it — Gmail, Salesforce\n\n📌 "I Provide Software" = IaaS/PaaS/SaaS'},
+          {title:'Key AWS Services',body:'Compute: EC2, Lambda, ECS\nStorage: S3, EBS, Glacier\nDB: RDS, DynamoDB, Redshift\nNet: VPC, Route 53, CloudFront\nSec: IAM, KMS, Shield'}
+        ],
+        videos:[
+          {title:'Cloud Computing Full Course',channel:'freeCodeCamp',duration:'3:48:01',url:'https://www.youtube.com/watch?v=M988_fsOSWo',tag:'Full Course'},
+          {title:'AWS Certified Cloud Practitioner',channel:'freeCodeCamp',duration:'13:55:23',url:'https://www.youtube.com/watch?v=SOTamWNgDKc',tag:'AWS'},
+          {title:'Azure Fundamentals Full Course',channel:'freeCodeCamp',duration:'3:46:09',url:'https://www.youtube.com/watch?v=NKEFWyqJ5XA',tag:'Azure'},
+          {title:'GCP Fundamentals',channel:'Google Cloud',duration:'Playlist',url:'https://www.youtube.com/watch?v=IeMYQ-qJeK4',tag:'GCP'}
+        ],
+        iqs:[{q:'Explain IaaS vs PaaS vs SaaS with examples.',a:'IaaS: you manage OS + runtime + app + data\n  Provider: hardware, networking\n  Example: AWS EC2, Azure VMs\n  Use: custom environments, legacy apps\n\nPaaS: you manage app + data only\n  Provider: OS, runtime, middleware\n  Example: Heroku, Google App Engine\n  Use: rapid development, no infra management\n\nSaaS: provider manages everything\n  Example: Gmail, Salesforce, Dropbox\n  Use: end users, zero management\n\nMore control ↔ Less control = IaaS ↔ SaaS'}]
+      },
+      {id:'ds2', name:'Distributed Systems', icon:'🕸️',
+        desc:'CAP Theorem · Consensus · Replication · Consistency · Microservices',
+        notes:[{title:'CAP Theorem & Consistency',body:'CAP Theorem: distributed system can guarantee max 2 of 3:\n  C — Consistency: all nodes same data\n  A — Availability: every request gets response\n  P — Partition Tolerance: works despite network failure\n\nSince P is unavoidable in practice → choose C or A:\n  CP: MongoDB, HBase, ZooKeeper\n  AP: Cassandra, DynamoDB, CouchDB\n  CA: RDBMS (not truly distributed)\n\nConsistency Models:\n  Strong: all reads reflect latest write\n  Eventual: reads will reflect writes eventually\n  Read-your-writes: guaranteed for same client'}],
+        videos:[
+          {title:'Distributed Systems Full Course',channel:'Martin Kleppmann',duration:'Playlist',url:'https://www.youtube.com/watch?v=UEAMfLPZZhE',tag:'Full Course'},
+          {title:'Designing Data-Intensive Applications',channel:'InfoQ',duration:'1:04:00',url:'https://www.youtube.com/watch?v=fU9hR3kiOK0',tag:'System Design'},
+          {title:'Microservices Explained',channel:'IBM Technology',duration:'10:07',url:'https://www.youtube.com/watch?v=CdBtNQZH8a4',tag:'Microservices'}
+        ],
+        iqs:[{q:'What is CAP theorem? Give examples.',a:'CAP Theorem: distributed system can provide at most 2 of:\n  C — Consistency: all nodes see same data simultaneously\n  A — Availability: every request receives response\n  P — Partition Tolerance: works when network splits\n\nIn reality: network partitions happen → must choose C or A\n\nCP (consistent, handles partitions): MongoDB, HBase, ZooKeeper\nAP (available, handles partitions): Cassandra, DynamoDB, CouchDB\nCA (consistent + available): traditional RDBMS\n  → Impossible in distributed systems with partitions!\n\nExample: During network split — MongoDB refuses writes (stays consistent), Cassandra accepts writes (stays available, reconciles later)'}]
+      },
+      {id:'pc', name:'Parallel Computing', icon:'⚡',
+        desc:'Threads · OpenMP · MPI · GPU Computing · CUDA · Performance',
+        notes:[{title:'Parallel Computing Models',body:'Shared Memory (Threads):\n  All processors share same memory\n  Synchronization needed (mutex, semaphore)\n  OpenMP: pragma-based parallelism in C/C++\n  Java/Python threads\n\nDistributed Memory (Message Passing):\n  Each processor has own memory\n  Communicate via messages\n  MPI: standard for scientific computing\n\nGPU Computing:\n  Thousands of small cores (CUDA, OpenCL)\n  Best for: embarrassingly parallel tasks\n  CUDA: NVIDIA GPU programming\n  Use: ML training, image processing, simulations\n\nAmdahl\'s Law: speedup limited by serial fraction\n  Speedup ≤ 1 / (s + (1-s)/n)  where s = serial fraction'}],
+        videos:[
+          {title:'Parallel Computing Full Course',channel:'freeCodeCamp',duration:'2:57:00',url:'https://www.youtube.com/watch?v=nR2EMMWhxME',tag:'Full Course'},
+          {title:'CUDA Programming Tutorial',channel:'NVIDIA',duration:'Playlist',url:'https://www.youtube.com/watch?v=1cHx1baKqq0',tag:'CUDA'},
+          {title:'OpenMP Tutorial',channel:'Tim Mattson',duration:'Playlist',url:'https://www.youtube.com/watch?v=nE-xN4Bf8XI',tag:'OpenMP'}
+        ],
+        iqs:[{q:'What is Amdahl\'s Law?',a:'Amdahl\'s Law: theoretical maximum speedup of parallel program\n\nFormula: Speedup = 1 / (s + (1-s)/n)\n  s = fraction of program that MUST be serial\n  n = number of processors\n\nExample: 5% serial, 8 processors\n  Speedup = 1/(0.05 + 0.95/8) = 1/0.169 ≈ 5.9×\n\nKey insight: even 5% serial code limits speedup to 20×\nImplication: focus on minimising serial portion\n\nGustafson\'s Law: as problem size grows, serial fraction shrinks → better scaling'}]
+      },
+      {id:'emb', name:'Embedded Systems', icon:'🔌',
+        desc:'Microcontrollers · RTOS · Arduino · Raspberry Pi · Sensors · IoT',
+        notes:[{title:'Embedded Systems Basics',body:'Embedded System: dedicated computer for specific function\n  Examples: washing machine, car ECU, pacemaker, ATM\n\nKey Components:\n  Microcontroller (MCU): CPU + memory + peripherals on one chip\n  Microprocessor (MPU): CPU only, needs external memory\n\nMemory Types:\n  Flash: program storage (non-volatile)\n  SRAM: variable storage (volatile, fast)\n  EEPROM: config/calibration data (non-volatile, writable)\n\nRTOS (Real-Time OS):\n  Deterministic timing guarantees\n  Hard RT: miss deadline = failure (airbag, pacemaker)\n  Soft RT: degraded quality ok (video streaming)\n  Examples: FreeRTOS, VxWorks, Zephyr'}],
+        videos:[
+          {title:'Embedded Systems Full Course',channel:'Fastbit Embedded Brain Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=T5p6a4eSM2Y',tag:'Full Course'},
+          {title:'Arduino Full Course',channel:'freeCodeCamp',duration:'5:00:00',url:'https://www.youtube.com/watch?v=zJ-LqeX_fLU',tag:'Arduino'},
+          {title:'Raspberry Pi for Beginners',channel:'NetworkChuck',duration:'1:09:36',url:'https://www.youtube.com/watch?v=WE_hqhD5pAY',tag:'Raspberry Pi'}
+        ],
+        iqs:[{q:'What is the difference between a microcontroller and a microprocessor?',a:'Microcontroller (MCU):\n  CPU + RAM + Flash + peripherals on single chip\n  Self-contained, low power, cheap\n  Examples: Arduino (ATmega), STM32, ESP32\n  Use: embedded products, IoT sensors, appliances\n\nMicroprocessor (MPU):\n  Only CPU — needs external RAM, storage, peripherals\n  High performance, more expensive\n  Examples: Intel Core, ARM Cortex-A\n  Use: laptops, smartphones, general computing\n\nKey differences:\n  MCU: integrated, real-time, deterministic\n  MPU: more powerful, runs full OS, not deterministic'}]
+      },
+      {id:'iot', name:'IoT (Internet of Things)', icon:'📡',
+        desc:'Sensors · Protocols · Edge Computing · MQTT · Arduino · Smart Devices',
+        notes:[{title:'IoT Architecture',body:'IoT Layers:\n  1. Perception Layer: sensors, actuators (collect data)\n  2. Network Layer: connectivity (WiFi, Bluetooth, LoRa, 5G)\n  3. Processing Layer: edge/fog/cloud computing\n  4. Application Layer: dashboards, analytics, control\n\nKey Protocols:\n  MQTT: lightweight pub/sub (IoT standard)\n  CoAP: REST-like for constrained devices\n  AMQP: message queuing\n  HTTP/REST: simple but heavier\n  Zigbee/Z-Wave: mesh network for home automation\n\nEdge Computing: process data near source\n  Reduces latency, bandwidth, privacy risk\n  Example: facial recognition in camera (not cloud)'}],
+        videos:[
+          {title:'IoT Full Course',channel:'edureka!',duration:'7:43:12',url:'https://www.youtube.com/watch?v=h0gWfVCSGQQ',tag:'Full Course'},
+          {title:'MQTT Explained',channel:'HiveMQ',duration:'8:00',url:'https://www.youtube.com/watch?v=LKz1jYngpcU',tag:'MQTT'},
+          {title:'ESP32 IoT Projects',channel:'Random Nerd Tutorials',duration:'Playlist',url:'https://www.youtube.com/watch?v=xPlN_Tk3VLQ',tag:'ESP32'}
+        ],
+        iqs:[{q:'What is MQTT and why is it used in IoT?',a:'MQTT (Message Queuing Telemetry Transport):\n  Lightweight pub/sub messaging protocol\n  Designed for constrained devices and low bandwidth\n\nArchitecture:\n  Broker: receives and routes messages (Mosquitto, HiveMQ)\n  Publisher: sends messages to topic\n  Subscriber: receives messages from topic\n\nWhy IoT uses MQTT:\n  ✅ Very lightweight (2-byte header)\n  ✅ Async, non-blocking\n  ✅ Works on low bandwidth, high latency networks\n  ✅ QoS levels (0=at most once, 1=at least once, 2=exactly once)\n  ✅ Simple implementation\n\nExample: temperature sensor publishes to "home/bedroom/temp" every 60s'}]
+      },
+      {id:'linux', name:'Linux & System Administration', icon:'🐧',
+        desc:'Commands · Shell Scripting · File System · Processes · Networking · Security',
+        notes:[{title:'Essential Linux Commands',body:'File System:\n  ls -la · cd · pwd · mkdir · rm -rf · cp · mv · find · locate\n\nFile Content:\n  cat · head · tail · grep · sed · awk · wc · sort · uniq\n\nProcess Management:\n  ps aux · top · htop · kill · killall · nice · nohup\n  systemctl start/stop/restart/status service\n\nNetworking:\n  ifconfig / ip addr · ping · curl · wget · ssh · scp · netstat · ss\n  iptables / ufw (firewall)\n\nPermissions:\n  chmod 755 file · chown user:group file\n  rwx: read(4) write(2) execute(1)\n  sudo: run as root\n\nShell Scripting:\n  #!/bin/bash · variables · if/else · for/while · functions · cron jobs'}],
+        videos:[
+          {title:'Linux Full Course',channel:'freeCodeCamp',duration:'5:08:09',url:'https://www.youtube.com/watch?v=sWbUDq4S6Y8',tag:'Full Course'},
+          {title:'Linux Command Line Crash Course',channel:'Traversy Media',duration:'1:16:55',url:'https://www.youtube.com/watch?v=yz7nYlnXLfE',tag:'Commands'},
+          {title:'Bash Scripting Full Course',channel:'freeCodeCamp',duration:'5:22:30',url:'https://www.youtube.com/watch?v=e7BufAVwDiM',tag:'Bash'}
+        ],
+        iqs:[{q:'Explain Linux file permissions.',a:'Permissions: rwxrwxrwx → owner · group · others\n  r = read (4) · w = write (2) · x = execute (1)\n\nchmod 755 file:\n  7 = rwx (owner: full)\n  5 = r-x (group: read+execute)\n  5 = r-x (others: read+execute)\n\nchmod 644 file:\n  6 = rw- (owner: read+write)\n  4 = r-- (group: read only)\n  4 = r-- (others: read only)\n\nSpecial permissions:\n  SUID (4): run as file owner\n  SGID (2): run as group owner\n  Sticky bit (1): only owner can delete (e.g., /tmp)'}]
+      }
+    ]
+  },
+  {
+    label:'🌐 Web / App Dev', color:'#10b981',
+    subjects:[
+      {id:'webdev', name:'Web Development (HTML/CSS/JS)', icon:'🌍',
+        desc:'HTML5 · CSS3 · JavaScript · Responsive Design · DOM · APIs',
+        notes:[{title:'HTML, CSS, JS Core',body:'HTML: structure — semantic tags (header, nav, main, article, footer)\nCSS: styling — selectors, box model, flexbox, grid, animations\nJavaScript: behaviour — DOM, events, fetch, async/await\n\nCSS Box Model: content → padding → border → margin\nCSS Flexbox: display:flex, justify-content, align-items\nCSS Grid: display:grid, grid-template-columns, grid-area\n\nJS Key Concepts:\n  var/let/const · arrow functions · promises · async/await\n  Array methods: map, filter, reduce, forEach\n  Closures, prototypes, event loop (call stack + microtask queue)'}],
+        videos:[
+          {title:'HTML & CSS Full Course',channel:'freeCodeCamp',duration:'6:00:00',url:'https://www.youtube.com/watch?v=mU6anWqZJcc',tag:'Full Course'},
+          {title:'JavaScript Full Course',channel:'freeCodeCamp',duration:'8:00:00',url:'https://www.youtube.com/watch?v=jS4aFq5-91M',tag:'JavaScript'},
+          {title:'CSS Flexbox in 15 Minutes',channel:'Web Dev Simplified',duration:'15:08',url:'https://www.youtube.com/watch?v=fYq5PXgSsbE',tag:'CSS'},
+          {title:'JavaScript Event Loop Explained',channel:'Fireship',duration:'5:00',url:'https://www.youtube.com/watch?v=8aGhZQkoFbQ',tag:'Async JS'}
+        ],
+        iqs:[{q:'Explain the JavaScript event loop.',a:'JS is single-threaded but handles async via event loop\n\nComponents:\n  Call Stack: executes synchronous code (LIFO)\n  Web APIs: handles async (setTimeout, fetch, DOM events)\n  Callback Queue (Task Queue): resolved callbacks wait here\n  Microtask Queue: Promises, queueMicrotask — higher priority\n  Event Loop: moves tasks from queues to call stack when empty\n\nOrder: synchronous → microtasks (Promises) → macrotasks (setTimeout)\n\nExample:\nconsole.log(1) // sync\nsetTimeout(()=>console.log(2),0) // macrotask\nPromise.resolve().then(()=>console.log(3)) // microtask\nconsole.log(4) // sync\n// Output: 1, 4, 3, 2'}]
+      },
+      {id:'react', name:'React / Frontend Frameworks', icon:'⚛️',
+        desc:'React · Vue · Angular · State Management · Hooks · Component Architecture',
+        notes:[{title:'React Core Concepts',body:'Component: reusable UI piece (function or class)\nProps: data passed parent → child (read-only)\nState: component\'s own data (useState)\nHooks: use React features in function components\n\nKey Hooks:\n  useState: local state\n  useEffect: side effects (API calls, subscriptions)\n  useContext: consume context without prop drilling\n  useRef: DOM references, mutable values\n  useMemo/useCallback: performance optimisation\n\nVirtual DOM: React\'s in-memory representation\n  Reconciliation: diff old vs new VDOM → minimal real DOM updates\n\nState Management:\n  useState: local component state\n  Context API: shared state without external lib\n  Redux/Zustand: global state for large apps'}],
+        videos:[
+          {title:'React Full Course',channel:'freeCodeCamp',duration:'8:00:00',url:'https://www.youtube.com/watch?v=bMknfKXIFA8',tag:'Full Course'},
+          {title:'React Hooks Explained',channel:'Web Dev Simplified',duration:'52:24',url:'https://www.youtube.com/watch?v=O6P86uwfdR0',tag:'Hooks'},
+          {title:'Next.js Full Course',channel:'Traversy Media',duration:'1:41:49',url:'https://www.youtube.com/watch?v=mTz0GXj8NN0',tag:'Next.js'},
+          {title:'Vue.js Crash Course',channel:'Traversy Media',duration:'1:50:38',url:'https://www.youtube.com/watch?v=qZXt1Aom3Cs',tag:'Vue'}
+        ],
+        iqs:[{q:'Explain React hooks and their common use cases.',a:'Hooks: let function components use React features\n\nuseState: manage local state\n  const [count, setCount] = useState(0)\n\nuseEffect: side effects (runs after render)\n  useEffect(()=>{ fetchData() }, [dependency])\n  Empty []: run once on mount\n  [dep]: run when dep changes\n  Return cleanup function: run on unmount\n\nuseRef: mutable reference that doesn\'t cause re-render\n  DOM access, previous value, timer IDs\n\nuseContext: consume context without prop drilling\n\nuseMemo: memoize expensive calculation\nuseCallback: memoize function reference'}]
+      },
+      {id:'node', name:'Node.js / Backend Development', icon:'🟢',
+        desc:'Node.js · Express · REST APIs · Authentication · Databases · Deployment',
+        notes:[{title:'Node.js & Express',body:'Node.js: JavaScript runtime built on V8\n  Non-blocking I/O, event-driven, single-threaded\n  Great for: APIs, real-time apps, microservices\n\nExpress.js: minimal web framework\n  app.get(\'/route\', (req, res) => res.json({...}))\n  Middleware: functions that run during request lifecycle\n  Error handling: (err, req, res, next) => ...\n\nREST API Conventions:\n  GET /items — list all\n  POST /items — create\n  GET /items/:id — get one\n  PUT /items/:id — update (full)\n  PATCH /items/:id — update (partial)\n  DELETE /items/:id — delete\n\nAuthentication:\n  JWT: stateless, token in Authorization header\n  Sessions: stateful, server stores session\n  OAuth: delegate auth to Google/GitHub'}],
+        videos:[
+          {title:'Node.js Full Course',channel:'freeCodeCamp',duration:'8:17:20',url:'https://www.youtube.com/watch?v=Oe421EPjeBE',tag:'Full Course'},
+          {title:'Express.js Crash Course',channel:'Traversy Media',duration:'1:07:32',url:'https://www.youtube.com/watch?v=L72fhGm1tfE',tag:'Express'},
+          {title:'REST API with Node.js',channel:'Traversy Media',duration:'1:08:03',url:'https://www.youtube.com/watch?v=ENrzD9HAZK4',tag:'REST API'},
+          {title:'JWT Authentication Tutorial',channel:'Web Dev Simplified',duration:'28:56',url:'https://www.youtube.com/watch?v=mbsmsi7l3r4',tag:'JWT'}
+        ],
+        iqs:[{q:'How does JWT authentication work?',a:'JWT (JSON Web Token): stateless authentication\n\nStructure: header.payload.signature (base64 encoded)\n  Header: algorithm, type\n  Payload: claims (user_id, role, exp)\n  Signature: HMAC-SHA256(header+payload, secret)\n\nFlow:\n1. User logs in → server creates JWT\n2. Client stores JWT (localStorage or httpOnly cookie)\n3. Client sends JWT in Authorization: Bearer <token>\n4. Server verifies signature → extract claims → process\n\nAdvantages: stateless, scalable, no DB lookup per request\nDisadvantages: cannot revoke before expiry (use short exp + refresh tokens)'}]
+      },
+      {id:'mobile', name:'Mobile App Development', icon:'📱',
+        desc:'Android · iOS · React Native · Flutter · Kotlin · Swift',
+        notes:[{title:'Mobile Development Approaches',body:'Native:\n  Android: Kotlin/Java (Android Studio)\n  iOS: Swift/Objective-C (Xcode)\n  Pros: best performance, full platform access\n  Cons: separate codebase per platform\n\nCross-Platform:\n  React Native: JS/React → native components\n    "Learn once, write anywhere"\n  Flutter: Dart → own rendering engine (Skia/Impeller)\n    "Write once, run anywhere"\n    Fast, beautiful, growing ecosystem\n\nKey Mobile Concepts:\n  Activity/Fragment (Android) · ViewController (iOS)\n  RecyclerView / FlatList: efficient long lists\n  Async operations: coroutines (Kotlin), async/await (Swift/Dart)\n  State management: ViewModel (Android), Provider/Riverpod (Flutter)'}],
+        videos:[
+          {title:'React Native Full Course',channel:'freeCodeCamp',duration:'4:30:00',url:'https://www.youtube.com/watch?v=0-S5a0eXPoc',tag:'React Native'},
+          {title:'Flutter Full Course',channel:'freeCodeCamp',duration:'5:06:50',url:'https://www.youtube.com/watch?v=VPvVD8t02U8',tag:'Flutter'},
+          {title:'Android Development Full Course (Kotlin)',channel:'freeCodeCamp',duration:'11:23:17',url:'https://www.youtube.com/watch?v=EExSSotojVI',tag:'Android'},
+          {title:'iOS Development with Swift',channel:'CodeWithChris',duration:'Playlist',url:'https://www.youtube.com/watch?v=09TeUXjzpKs',tag:'iOS'}
+        ],
+        iqs:[{q:'Compare React Native vs Flutter.',a:'React Native:\n  Language: JavaScript/TypeScript\n  Rendering: native platform components\n  Performance: good (bridge overhead)\n  Learning curve: easy for JS developers\n  Ecosystem: huge (npm)\n  Use: cross-platform apps, web background\n\nFlutter:\n  Language: Dart\n  Rendering: own engine (pixel-perfect everywhere)\n  Performance: excellent (no bridge)\n  Learning curve: new language (Dart)\n  Ecosystem: growing fast\n  Use: pixel-perfect UI, high-performance\n\nBoth: single codebase for iOS + Android + Web\nChoose Flutter for UI consistency; React Native for JS team'}]
+      },
+      {id:'restapi', name:'REST APIs & Microservices', icon:'🔗',
+        desc:'REST · GraphQL · API Design · Microservices · Service Mesh · gRPC',
+        notes:[{title:'REST vs GraphQL vs gRPC',body:'REST:\n  Standard HTTP verbs, JSON responses\n  Simple, widely supported\n  Limitation: over-fetching, under-fetching\n\nGraphQL:\n  Client requests exactly what it needs\n  Single endpoint, strongly typed schema\n  Best for: complex nested data, multiple frontends\n\ngRPC:\n  Protocol Buffers (binary, faster than JSON)\n  Strongly typed, auto-generated clients\n  Best for: internal service-to-service, high performance\n\nMicroservices Patterns:\n  API Gateway: single entry point for all clients\n  Circuit Breaker: fail fast, prevent cascade failure\n  Service Discovery: dynamic service registration (Consul, Eureka)\n  Saga Pattern: distributed transactions'}],
+        videos:[
+          {title:'REST API Design Best Practices',channel:'Fireship',duration:'10:00',url:'https://www.youtube.com/watch?v=7nm1pYuKAhY',tag:'REST Design'},
+          {title:'GraphQL Full Course',channel:'freeCodeCamp',duration:'5:58:44',url:'https://www.youtube.com/watch?v=ed8SzALpx1Q',tag:'GraphQL'},
+          {title:'Microservices Architecture',channel:'IBM Technology',duration:'9:48',url:'https://www.youtube.com/watch?v=CdBtNQZH8a4',tag:'Microservices'},
+          {title:'gRPC Crash Course',channel:'Traversy Media',duration:'1:01:42',url:'https://www.youtube.com/watch?v=Yw4rkaTc0f8',tag:'gRPC'}
+        ],
+        iqs:[{q:'What is an API Gateway and why use it?',a:'API Gateway: single entry point for all client requests to microservices\n\nResponsibilities:\n  • Request routing → correct microservice\n  • Authentication/Authorization (JWT validation)\n  • Rate limiting and throttling\n  • Load balancing\n  • SSL termination\n  • Request/response transformation\n  • Caching\n  • Logging and monitoring\n\nExamples: AWS API Gateway, Kong, Nginx, Traefik\n\nBenefit: clients talk to one endpoint, not dozens of services\nChallenge: single point of failure → must be highly available'}]
+      },
+      {id:'devops', name:'DevOps & CI/CD', icon:'🔄',
+        desc:'Git · Jenkins · GitHub Actions · CI/CD · Docker · Kubernetes · Monitoring',
+        notes:[{title:'CI/CD Pipeline',body:'CI (Continuous Integration):\n  Merge code frequently → automated build + test\n  Tools: Jenkins, GitHub Actions, GitLab CI, CircleCI\n\nCD (Continuous Delivery): automated deployment to staging\nCD (Continuous Deployment): auto-deploy to production\n\nTypical Pipeline:\n  Code Push → Lint/Format → Unit Tests → Build →\n  Integration Tests → Security Scan → Deploy to Staging →\n  Smoke Tests → Deploy to Production\n\nGit Strategies:\n  GitFlow: main, develop, feature, release, hotfix branches\n  Trunk-Based: everyone commits to main, short-lived branches\n  Feature Flags: deploy code hidden behind flag'}],
+        videos:[
+          {title:'DevOps Full Course',channel:'edureka!',duration:'8:18:09',url:'https://www.youtube.com/watch?v=hQcFE0RD0cQ',tag:'Full Course'},
+          {title:'GitHub Actions Full Course',channel:'TechWorld with Nana',duration:'2:50:00',url:'https://www.youtube.com/watch?v=R8_veQiYBjI',tag:'GitHub Actions'},
+          {title:'Jenkins Full Course',channel:'edureka!',duration:'6:20:35',url:'https://www.youtube.com/watch?v=7KCS70sCoK0',tag:'Jenkins'},
+          {title:'CI/CD Explained in 5 Minutes',channel:'IBM Technology',duration:'4:52',url:'https://www.youtube.com/watch?v=scEDHsr3APg',tag:'CI/CD'}
+        ],
+        iqs:[{q:'What is CI/CD and how does a typical pipeline work?',a:'CI (Continuous Integration): developers merge code frequently, automated tests run on each merge\nCD (Continuous Delivery): merged code always deployable to staging automatically\nCD (Continuous Deployment): every passing build auto-deploys to production\n\nTypical Pipeline:\n1. Developer pushes code to feature branch\n2. PR triggers: lint → unit tests → build Docker image\n3. Merge to main: integration tests → security scan\n4. Deploy to staging: automated smoke tests\n5. Manual approval (CD) or auto (CDeploy) → production\n\nTools: GitHub Actions, Jenkins, GitLab CI, CircleCI\nBenefits: catch bugs early, faster releases, reliable deployments'}]
+      },
+      {id:'docker', name:'Docker & Kubernetes', icon:'🐳',
+        desc:'Containers · Images · Dockerfile · Pods · Services · Helm · Scaling',
+        notes:[{title:'Docker Fundamentals',body:'Container: isolated, lightweight process (not a VM)\n  Shares host OS kernel — much faster than VMs\n\nDockerfile → Image → Container\n\nKey Commands:\n  docker build -t myapp . → build image\n  docker run -p 8080:80 myapp → run container\n  docker ps → list running containers\n  docker exec -it <id> bash → shell into container\n  docker-compose up → multi-container app\n\nDockerfile basics:\n  FROM node:18\n  WORKDIR /app\n  COPY package*.json ./\n  RUN npm install\n  COPY . .\n  EXPOSE 3000\n  CMD ["node", "index.js"]'},
+        {title:'Kubernetes Basics',body:'Kubernetes (K8s): container orchestration\n\nKey Objects:\n  Pod: smallest unit, 1+ containers\n  Deployment: manages pod replicas, rolling updates\n  Service: exposes pods (ClusterIP, NodePort, LoadBalancer)\n  ConfigMap: non-sensitive config\n  Secret: sensitive data (base64)\n  Ingress: HTTP routing\n\nCommands:\n  kubectl get pods/deployments/services\n  kubectl apply -f deployment.yaml\n  kubectl scale deployment myapp --replicas=3\n  kubectl logs <pod-name>\n  kubectl exec -it <pod> -- bash\n\nHelm: package manager for Kubernetes (like npm for K8s)'}],
+        videos:[
+          {title:'Docker Full Course',channel:'freeCodeCamp',duration:'4:52:12',url:'https://www.youtube.com/watch?v=fqMOX6JJhGo',tag:'Docker'},
+          {title:'Kubernetes Full Course',channel:'TechWorld with Nana',duration:'4:18:18',url:'https://www.youtube.com/watch?v=X48VuDVv0do',tag:'Kubernetes'},
+          {title:'Docker & Kubernetes Full Course',channel:'freeCodeCamp',duration:'4:18:36',url:'https://www.youtube.com/watch?v=Wf2eSG3owoA',tag:'Full Course'},
+          {title:'Docker Compose in 12 Minutes',channel:'Jake Wright',duration:'12:51',url:'https://www.youtube.com/watch?v=Qw9zlE3t8Ko',tag:'Docker Compose'}
+        ],
+        iqs:[{q:'What is Kubernetes and what problems does it solve?',a:'Kubernetes: open-source container orchestration system\n\nProblems it solves:\n  Scheduling: place containers on right nodes\n  Scaling: auto-scale based on CPU/memory/custom metrics\n  Self-healing: restart failed containers, replace unhealthy nodes\n  Service Discovery: automatic DNS for services\n  Load Balancing: distribute traffic across pods\n  Rolling Updates: zero-downtime deployments\n  Secret Management: encrypted storage for credentials\n\nKey concepts:\n  Cluster: master + worker nodes\n  Pod: 1+ containers sharing network namespace\n  Deployment: desired state (3 replicas of app)\n  Service: stable IP/DNS for pods (they come and go)'}]
+      }
+    ]
+  },
+  {
+    label:'📐 Maths & Science (Engineering)', color:'#f59e0b',
+    subjects:[
+      {id:'engmath', name:'Engineering Mathematics', icon:'∑',
+        desc:'Calculus · Linear Algebra · Probability · Transforms · Complex Analysis',
+        notes:[{title:'Key Engineering Math Topics',body:'Calculus:\n  Differentiation: rates of change, optimization\n  Integration: area, accumulated change\n  Partial Derivatives: functions of multiple variables\n  Gradient: direction of steepest ascent ∇f\n\nLaplace Transform: s-domain analysis\n  L{f(t)} = F(s), useful for solving ODEs\n\nFourier Transform: frequency domain\n  Decompose signal into frequencies\n  DFT for discrete signals (used in image processing)\n\nComplex Numbers: a + bi\n  |z| = √(a²+b²), arg(z) = arctan(b/a)\n  Euler\'s formula: e^(iθ) = cos θ + i sin θ'}],
+        videos:[
+          {title:'Engineering Mathematics Full Course',channel:'NPTEL',duration:'Playlist',url:'https://www.youtube.com/watch?v=r9i83KZkeDQ',tag:'Full Course'},
+          {title:'3Blue1Brown — Essence of Calculus',channel:'3Blue1Brown',duration:'Playlist',url:'https://www.youtube.com/watch?v=WUvTyaaNkzM',tag:'Calculus'},
+          {title:'Laplace Transform Full Course',channel:'Professor Leonard',duration:'Playlist',url:'https://www.youtube.com/watch?v=7UvtU75NXTg',tag:'Laplace'}
+        ],
+        iqs:[{q:'What is the Fourier Transform and why is it useful?',a:'Fourier Transform: decomposes a signal into sum of sinusoids\n  F(ω) = ∫f(t)e^(-iωt)dt\n\nInverse: reconstruct signal from frequencies\n\nApplications:\n  Signal Processing: filter noise (remove high/low frequencies)\n  Image Processing: DFT for spatial frequency analysis\n  Audio: equalizers, compression (MP3 uses MDCT)\n  Communications: modulation, OFDM (WiFi, 4G)\n  ML: Fourier features, spectral methods\n\nDFT: discrete version for digital signals\nFFT: Fast Fourier Transform — O(n log n) algorithm for DFT'}]
+      },
+      {id:'linalg', name:'Linear Algebra', icon:'📏',
+        desc:'Vectors · Matrices · Eigenvalues · Transformations · SVD · PCA',
+        notes:[{title:'Linear Algebra for ML',body:'Vectors: magnitude + direction in n-dimensional space\nDot product: a·b = |a||b|cos θ\n\nMatrix Operations:\n  Multiplication: AB (rows × columns)\n  Transpose: Aᵀ — flip rows and columns\n  Inverse: A⁻¹ (square, non-singular matrices)\n  Determinant: scalar, det≠0 → matrix invertible\n\nEigenvalues & Eigenvectors:\n  Av = λv — vector direction unchanged by transformation\n  PCA: eigenvectors of covariance matrix = principal components\n\nSVD (Singular Value Decomposition):\n  A = UΣVᵀ\n  Used in: PCA, recommender systems, image compression\n\n📌 Linear algebra is the language of ML'}],
+        videos:[
+          {title:'Essence of Linear Algebra — 3Blue1Brown',channel:'3Blue1Brown',duration:'Playlist',url:'https://www.youtube.com/watch?v=fNk_zzaMoSs',tag:'Visual Intuition'},
+          {title:'Linear Algebra Full Course',channel:'MIT OpenCourseWare',duration:'Playlist',url:'https://www.youtube.com/watch?v=7UJ4CFRGd-U',tag:'MIT'},
+          {title:'Linear Algebra for Machine Learning',channel:'Weights & Biases',duration:'1:28:00',url:'https://www.youtube.com/watch?v=uZeDTwWcnuY',tag:'ML'}
+        ],
+        iqs:[{q:'What are eigenvalues and eigenvectors?',a:'Eigenvalue/Eigenvector: special vector whose direction is unchanged by matrix transformation\n  Av = λv\n  v = eigenvector, λ = eigenvalue\n\nGeometric meaning: matrix A stretches/shrinks v by factor λ (no rotation)\n\nApplications:\n  PCA: eigenvectors of covariance matrix = principal components\n    Largest eigenvalue → direction of maximum variance\n  Spectral Clustering: graph Laplacian eigenvectors\n  Google PageRank: dominant eigenvector of link matrix\n  Differential equations: e^(At) system stability\n\nHow to find: det(A - λI) = 0 → characteristic polynomial'}]
+      },
+      {id:'prob', name:'Probability & Statistics', icon:'🎲',
+        desc:'Distributions · Hypothesis Testing · Bayesian · Regression · Inference',
+        notes:[{title:'Probability Fundamentals',body:'Basic Rules:\n  P(A∪B) = P(A) + P(B) - P(A∩B)\n  P(A|B) = P(A∩B)/P(B) — conditional probability\n  Bayes\' Theorem: P(A|B) = P(B|A)×P(A)/P(B)\n\nDistributions:\n  Bernoulli: single trial, success/failure\n  Binomial: n trials, k successes\n  Normal: bell curve, 68-95-99.7 rule\n  Poisson: count of events in interval\n  Exponential: time between events\n\nStatistical Tests:\n  t-test: compare means (1 or 2 groups)\n  Chi-Square: categorical independence\n  ANOVA: compare means of 3+ groups\n  p-value < 0.05 → reject null hypothesis'}],
+        videos:[
+          {title:'Statistics Full Course — freeCodeCamp',channel:'freeCodeCamp',duration:'8:15:07',url:'https://www.youtube.com/watch?v=xxpc-HPKN28',tag:'Full Course'},
+          {title:'Statistics — StatQuest playlist',channel:'StatQuest',duration:'Playlist',url:'https://www.youtube.com/watch?v=qBigTkBLU6g',tag:'Intuition'},
+          {title:'Bayes Theorem Explained',channel:'3Blue1Brown',duration:'22:00',url:'https://www.youtube.com/watch?v=HZGCoVF3YvM',tag:'Bayesian'},
+          {title:'Hypothesis Testing',channel:'StatQuest',duration:'Playlist',url:'https://www.youtube.com/watch?v=0oc49DyA3hU',tag:'Hypothesis'}
+        ],
+        iqs:[{q:'Explain Bayes\' Theorem with an example.',a:'Bayes\' Theorem: P(A|B) = P(B|A) × P(A) / P(B)\n  Update prior belief with new evidence\n\nMedical example:\n  Disease prevalence (prior): P(D) = 0.01\n  Test sensitivity: P(+|D) = 0.99\n  False positive rate: P(+|¬D) = 0.05\n\nQuestion: given positive test, what is P(D|+)?\n  P(+) = P(+|D)×P(D) + P(+|¬D)×P(¬D)\n       = 0.99×0.01 + 0.05×0.99 = 0.0099 + 0.0495 = 0.0594\n  P(D|+) = 0.99×0.01 / 0.0594 ≈ 0.167 (only 16.7%!)\n\nInsight: rare disease + imperfect test → most positives are false positives'}]
+      },
+      {id:'calc', name:'Calculus & Differential Equations', icon:'∫',
+        desc:'Differentiation · Integration · ODEs · PDEs · Optimization',
+        notes:[{title:'Calculus for Engineering',body:'Differentiation rules:\n  Power: d/dx(xⁿ) = nxⁿ⁻¹\n  Chain: d/dx(f(g(x))) = f\'(g(x))·g\'(x)\n  Product: d/dx(uv) = u\'v + uv\'\n  Quotient: d/dx(u/v) = (u\'v - uv\')/v²\n\nIntegration:\n  Substitution: ∫f(g(x))g\'(x)dx\n  Integration by parts: ∫u dv = uv - ∫v du\n\nODE Types:\n  Separable: dy/dx = f(x)g(y)\n  Linear 1st order: dy/dx + P(x)y = Q(x)\n  2nd order homogeneous: ay\'\' + by\' + cy = 0\n  Characteristic equation → eigenvalues → solution'}],
+        videos:[
+          {title:'Calculus Full Course — MIT',channel:'MIT OpenCourseWare',duration:'Playlist',url:'https://www.youtube.com/watch?v=7K1sB05pE0A',tag:'MIT'},
+          {title:'Differential Equations Full Course',channel:'Professor Leonard',duration:'Playlist',url:'https://www.youtube.com/watch?v=xf-3ATzFyKA',tag:'ODEs'},
+          {title:'Calculus — Khan Academy',channel:'Khan Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=EKvHQc3QEow',tag:'Khan Academy'}
+        ],
+        iqs:[{q:'How is calculus used in machine learning?',a:'Gradient Descent uses calculus:\n  Compute ∂Loss/∂w for each weight w\n  Update: w ← w - α × ∂Loss/∂w\n\nBackpropagation: chain rule to propagate gradients\n  ∂L/∂w₁ = ∂L/∂y × ∂y/∂w₁\n\nOptimization:\n  Find minimum of loss function L(w)\n  Set ∇L = 0 (or use iterative gradient descent)\n\nMaximum Likelihood: take log-likelihood, differentiate, solve\n\nKey operations:\n  Partial derivatives: ∂f/∂x treating other vars as constants\n  Jacobian: matrix of all partial derivatives\n  Hessian: matrix of second partial derivatives (curvature)'}]
+      },
+      {id:'nummet', name:'Numerical Methods', icon:'🔢',
+        desc:'Root Finding · Interpolation · Numerical Integration · ODE Solvers',
+        notes:[{title:'Numerical Methods Overview',body:'Root Finding:\n  Bisection: bracket [a,b], halve each step — slow, always converges\n  Newton-Raphson: x_{n+1} = x_n - f(x_n)/f\'(x_n) — fast, needs derivative\n  Secant: like Newton but approx derivative with finite difference\n\nInterpolation:\n  Lagrange: polynomial through n points\n  Newton\'s Divided Differences: efficient update\n  Cubic Spline: smooth piecewise polynomial\n\nNumerical Integration:\n  Trapezoidal: area of trapezoids — O(h²) error\n  Simpson\'s 1/3: parabolic fit — O(h⁴) error\n  Gaussian Quadrature: optimal node placement\n\nODE Solvers:\n  Euler: y_{n+1} = yₙ + h·f(tₙ, yₙ) — simple, low accuracy\n  Runge-Kutta 4 (RK4): gold standard for ODEs'}],
+        videos:[
+          {title:'Numerical Methods Full Course',channel:'NPTEL',duration:'Playlist',url:'https://www.youtube.com/watch?v=MrANKsOHOzs',tag:'Full Course'},
+          {title:'Numerical Analysis — MIT',channel:'MIT OpenCourseWare',duration:'Playlist',url:'https://www.youtube.com/watch?v=bZ4OyRADY0I',tag:'MIT'}
+        ],
+        iqs:[{q:'Compare Bisection and Newton-Raphson methods.',a:'Bisection Method:\n  Requires f(a)×f(b)<0 (sign change bracket)\n  Always converges (guaranteed)\n  Linear convergence — slow\n  No derivative needed\n  Use: when function is poorly behaved\n\nNewton-Raphson:\n  x_{n+1} = x_n - f(x_n)/f\'(x_n)\n  Quadratic convergence — very fast\n  Needs f\'(x)\n  May diverge (bad initial guess, inflection points)\n  Use: well-behaved functions, need speed\n\nHybrid: start with bisection to get close, switch to Newton-Raphson'}]
+      },
+      {id:'digelec', name:'Digital Electronics & Logic Design', icon:'💡',
+        desc:'Logic Gates · Flip-Flops · Sequential Circuits · ALU · Verilog · FPGA',
+        notes:[{title:'Logic Design Fundamentals',body:'Boolean Algebra:\n  AND: A·B · OR: A+B · NOT: Ā\n  De Morgan: Ā+B̄ = (A·B) , Ā·B̄ = (A+B)\n\nLogic Gates: AND, OR, NOT, NAND, NOR, XOR, XNOR\n  NAND & NOR: universal gates (can build any circuit)\n\nCombinational Circuits:\n  Adder: Half (XOR + AND), Full (3 inputs)\n  Multiplexer (MUX): select one of N inputs\n  Decoder: n inputs → 2ⁿ outputs\n  Comparator: compare A and B\n\nSequential Circuits (have memory):\n  Flip-Flops: D, JK, SR, T\n  Registers: collection of flip-flops\n  Counters: ripple, synchronous\n\nKarnaugh Maps (K-Map): simplify Boolean expressions visually'}],
+        videos:[
+          {title:'Digital Electronics Full Course',channel:'Neso Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=M0mx8S05v60',tag:'Full Course'},
+          {title:'Verilog HDL Tutorial',channel:'Nandland',duration:'Playlist',url:'https://www.youtube.com/watch?v=PJGvZSlsD5M',tag:'Verilog'},
+          {title:'Boolean Algebra & Logic Gates',channel:'Khan Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=EPJf4owqwdA',tag:'Logic'}
+        ],
+        iqs:[{q:'Why are NAND and NOR called universal gates?',a:'Universal gate: can implement ANY Boolean function using only that gate\n\nNAND is universal:\n  NOT: A NAND A = Ā\n  AND: (A NAND B) NAND (A NAND B)\n  OR: (A NAND A) NAND (B NAND B)\n\nNOR is universal:\n  NOT: A NOR A = Ā\n  OR: (A NOR B) NOR (A NOR B)\n  AND: (A NOR A) NOR (B NOR B)\n\nPractical importance:\n  Only need one type of gate to build entire CPU\n  Simplifies manufacturing (one gate design, mass production)\n  CMOS NAND/NOR gates are efficient to implement'}]
+      },
+      {id:'signals', name:'Signals & Systems', icon:'📡',
+        desc:'Fourier · Laplace · Z-Transform · Convolution · Filters · DSP',
+        notes:[{title:'Signals & Systems Overview',body:'Signal Types:\n  Continuous-time vs Discrete-time\n  Periodic vs Aperiodic\n  Deterministic vs Random\n\nSystem Properties:\n  Linear: superposition holds\n  Time-Invariant: delay input = delay output\n  LTI: Linear Time-Invariant — analysed by convolution\n\nConvolution: y(t) = x(t) * h(t) = ∫x(τ)h(t-τ)dτ\n  Output = input convolved with impulse response h(t)\n\nTransforms:\n  Fourier: frequency analysis, spectrum\n  Laplace: generalized Fourier, stability analysis\n  Z-Transform: discrete-time version of Laplace\n\nFilters:\n  LPF: pass low frequencies (smooth)\n  HPF: pass high frequencies (edges)\n  BPF: pass band of frequencies'}],
+        videos:[
+          {title:'Signals and Systems Full Course',channel:'NPTEL',duration:'Playlist',url:'https://www.youtube.com/watch?v=s8rsR_TStaA',tag:'Full Course'},
+          {title:'DSP Full Course — Alan Oppenheim',channel:'MIT OpenCourseWare',duration:'Playlist',url:'https://www.youtube.com/watch?v=rkvEM5Y3N60',tag:'MIT DSP'},
+          {title:'Fourier Transform Explained',channel:'3Blue1Brown',duration:'20:57',url:'https://www.youtube.com/watch?v=spUNpyF58BY',tag:'Fourier'}
+        ],
+        iqs:[{q:'What is convolution and why is it important?',a:'Convolution: mathematical operation combining two signals\n  y(t) = x(t) * h(t) = ∫x(τ)h(t-τ)dτ\n\nFor LTI systems: output = input * impulse response\n  Know h(t) → can predict output for ANY input\n\nIn discrete domain:\n  y[n] = Σ x[k]·h[n-k]\n\nConvolution Theorem:\n  Convolution in time = multiplication in frequency\n  Much faster to: DFT(x) × DFT(h) → IDFT\n\nApplications:\n  Signal filtering: multiply by H(ω) in frequency domain\n  Image processing: kernels are 2D convolution\n  CNN: convolutional layers learn filter kernels'}]
+      }
+    ]
+  },
+  {
+    label:'📚 General / Other Streams', color:'#6b7280',
+    subjects:[
+      {id:'math', name:'Mathematics', icon:'➕',
+        desc:'Algebra · Calculus · Geometry · Number Theory · Discrete Math',
+        notes:[{title:'Mathematics Fundamentals',body:'Algebra:\n  Solving equations, polynomials, factoring\n  Quadratic formula: x = (-b ± √(b²-4ac))/2a\n\nNumber Theory:\n  Prime numbers, GCD (Euclidean algorithm), LCM\n  Modular arithmetic: a ≡ b (mod n)\n\nGeometry:\n  Circle: area = πr², circumference = 2πr\n  Triangle: area = ½bh, Pythagorean: a²+b²=c²\n  Trigonometry: sin, cos, tan and their identities\n\nSequences:\n  Arithmetic: a_n = a + (n-1)d\n  Geometric: a_n = ar^(n-1)\n  Fibonacci: F(n) = F(n-1) + F(n-2)'}],
+        videos:[
+          {title:'Mathematics Full Course',channel:'Khan Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=NybHckSEQBI',tag:'Full Course'},
+          {title:'3Blue1Brown — Math Playlist',channel:'3Blue1Brown',duration:'Playlist',url:'https://www.youtube.com/watch?v=WUvTyaaNkzM',tag:'Visual Math'},
+          {title:'Number Theory — Full Course',channel:'freeCodeCamp',duration:'4:16:28',url:'https://www.youtube.com/watch?v=cJLkB3H0jcc',tag:'Number Theory'}
+        ],
+        iqs:[{q:'What is modular arithmetic and where is it used?',a:'Modular arithmetic: "clock arithmetic" — numbers wrap around\na ≡ b (mod n) means n divides (a-b)\n\nExamples:\n  17 ≡ 5 (mod 12) — like 5pm on 12-hour clock\n  25 ≡ 1 (mod 12)\n\nApplications:\n  Cryptography: RSA relies on modular exponentiation\n  Hash functions: index = key mod table_size\n  Day-of-week calculation\n  Cyclic data structures\n  Error detection: checksums (ISBN, credit cards)\n\nEuler\'s theorem: a^φ(n) ≡ 1 (mod n) — basis of RSA'}]
+      },
+      {id:'phys', name:'Physics', icon:'⚛️',
+        desc:'Mechanics · Electromagnetism · Thermodynamics · Quantum · Optics',
+        notes:[{title:'Physics Key Concepts',body:'Mechanics:\n  Newton\'s Laws · Work=F·d · KE=½mv² · PE=mgh\n  Conservation of energy and momentum\n\nElectromagnetism:\n  Coulomb\'s Law: F = kq₁q₂/r²\n  Electric field E, Potential V\n  Magnetic force: F = qv×B\n  Maxwell\'s equations (4 equations governing EM)\n\nThermodynamics:\n  0th Law: thermal equilibrium\n  1st Law: ΔU = Q - W (energy conservation)\n  2nd Law: entropy always increases\n  3rd Law: absolute zero unattainable\n\nModern Physics:\n  E = mc² (mass-energy equivalence)\n  Photoelectric effect: E = hf\n  de Broglie: λ = h/p (wave-particle duality)'}],
+        videos:[
+          {title:'Physics Full Course',channel:'Khan Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=ZM8ECpBuQYE',tag:'Full Course'},
+          {title:'Physics — Crash Course',channel:'Crash Course',duration:'Playlist',url:'https://www.youtube.com/watch?v=ZAqIoDhornk',tag:'Crash Course'},
+          {title:'Quantum Mechanics for Everyone',channel:'PBS Space Time',duration:'Playlist',url:'https://www.youtube.com/watch?v=p7bzE1E5PMY',tag:'Quantum'}
+        ],
+        iqs:[{q:'Explain the first and second laws of thermodynamics.',a:'First Law (Energy Conservation):\n  ΔU = Q - W\n  U = internal energy, Q = heat added, W = work done BY system\n  Energy cannot be created or destroyed, only converted\n\nSecond Law (Entropy):\n  Entropy of isolated system always increases\n  Heat flows naturally from hot to cold (not reverse)\n  No engine is 100% efficient\n  Carnot efficiency = 1 - T_cold/T_hot\n\nImplications:\n  Perpetual motion machines are impossible\n  Time has a direction (arrow of time)\n  Universe tends toward disorder'}]
+      },
+      {id:'chem', name:'Chemistry', icon:'⚗️',
+        desc:'Atomic Structure · Chemical Bonds · Reactions · Thermochemistry · Organic',
+        notes:[{title:'Chemistry Fundamentals',body:'Atomic Structure:\n  Protons (nucleus), Neutrons (nucleus), Electrons (shells)\n  Atomic number = protons · Mass number = p + n\n  Isotopes: same protons, different neutrons\n\nChemical Bonding:\n  Ionic: metal + non-metal (electron transfer)\n  Covalent: non-metal + non-metal (electron sharing)\n  Metallic: positive ions in electron sea\n  Hydrogen Bond: dipole-dipole (water, DNA)\n\nMole Concept:\n  1 mole = 6.022×10²³ particles (Avogadro\'s number)\n  Molar mass: mass of 1 mole in grams\n\nBalancing Equations: conservation of atoms and charge\n\nOrganic Chemistry:\n  Alkanes (CₙH₂ₙ₊₂) · Alkenes · Alkynes · Benzene\n  Functional groups: -OH, -COOH, -NH₂, -CHO'}],
+        videos:[
+          {title:'Chemistry Full Course',channel:'Khan Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=uVFCOfSuPTo',tag:'Full Course'},
+          {title:'Organic Chemistry — Crash Course',channel:'Crash Course',duration:'Playlist',url:'https://www.youtube.com/watch?v=vela6qB6pIg',tag:'Organic'},
+          {title:'Periodic Table Explained',channel:'Veritasium',duration:'5:02',url:'https://www.youtube.com/watch?v=IFKnq9QM6_A',tag:'Periodic Table'}
+        ],
+        iqs:[{q:'What are the types of chemical bonds?',a:'Ionic Bond:\n  Metal donates electron to non-metal\n  Strong, high melting point, conducts electricity when dissolved\n  Example: NaCl (Na⁺ + Cl⁻)\n\nCovalent Bond:\n  Atoms share electrons\n  Can be single (1 pair), double (2 pairs), triple (3 pairs)\n  Example: H₂O, CO₂\n\nPolar Covalent:\n  Unequal sharing → partial charges (δ+, δ-)\n  Electronegativity difference 0.4–1.7\n  Example: H-Cl, H-O\n\nMetallic Bond:\n  Cations in "sea of electrons"\n  Conducts electricity, malleable\n\nHydrogen Bond:\n  N-H, O-H, F-H dipoles\n  Important for: water properties, DNA base pairing, protein structure'}]
+      },
+      {id:'bio', name:'Biology', icon:'🧬',
+        desc:'Cell Biology · Genetics · Evolution · Ecology · Molecular Biology',
+        notes:[{title:'Molecular Biology Essentials',body:'Central Dogma: DNA → RNA → Protein\n  Transcription: DNA → mRNA (in nucleus)\n  Translation: mRNA → protein (ribosome)\n\nDNA Structure: double helix, base pairs\n  A-T (adenine-thymine), G-C (guanine-cytosine)\n\nCell Types:\n  Prokaryote: no nucleus (bacteria, archaea)\n  Eukaryote: nucleus + organelles (animals, plants, fungi)\n\nMitosis vs Meiosis:\n  Mitosis: 1 cell → 2 identical daughter cells (growth, repair)\n  Meiosis: 1 cell → 4 haploid gametes (sexual reproduction)\n\nMendelian Genetics:\n  Dominant (B) · Recessive (b)\n  Punnett square: predict offspring ratios'}],
+        videos:[
+          {title:'Biology Full Course',channel:'Khan Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=_RdAFm7t2lM',tag:'Full Course'},
+          {title:'Molecular Biology — Crash Course',channel:'Crash Course',duration:'Playlist',url:'https://www.youtube.com/watch?v=8Vn_ZTjh_j8',tag:'Molecular Bio'},
+          {title:'Genetics — Kurzgesagt',channel:'Kurzgesagt',duration:'8:24',url:'https://www.youtube.com/watch?v=AhsIF-cmoQQ',tag:'Genetics'}
+        ],
+        iqs:[{q:'Explain the Central Dogma of molecular biology.',a:'Central Dogma: DNA → RNA → Protein\n\nReplication: DNA → DNA\n  Before cell division, entire genome copied\n  Enzymes: helicase (unwind), DNA polymerase (copy)\n\nTranscription: DNA → mRNA\n  In nucleus (eukaryotes)\n  RNA polymerase reads DNA template strand\n  mRNA travels to ribosome\n\nTranslation: mRNA → Protein\n  Ribosome reads codons (3 nucleotides each)\n  tRNA brings matching amino acid\n  64 codons → 20 amino acids (some redundancy)\n  Start: AUG (methionine) · Stop: UAA, UAG, UGA\n\nRNA types: mRNA (message), tRNA (transfer), rRNA (ribosomal)'}]
+      },
+      {id:'hist', name:'History', icon:'📜',
+        desc:'World History · Ancient Civilizations · Modern History · Indian History',
+        notes:[{title:'Study Strategy for History',body:'Key Strategies:\n  1. Timeline First: establish chronological order\n  2. Cause & Effect: every event has causes and consequences\n  3. Key Figures: who acted and why?\n  4. Themes: political, economic, social, cultural changes\n\nPeriodization:\n  Ancient: before 500 CE\n  Medieval: 500-1500 CE\n  Early Modern: 1500-1800 CE\n  Modern: 1800-present\n\nFor Indian History:\n  Ancient → Maurya, Gupta empires\n  Medieval → Delhi Sultanate, Mughal Empire\n  Modern → British colonization, Independence Movement\n\n📌 Link events: WWI conditions → rise of fascism → WWII'}],
+        videos:[
+          {title:'World History Full Course',channel:'CrashCourse',duration:'Playlist',url:'https://www.youtube.com/watch?v=Yocja_N5s1I',tag:'World History'},
+          {title:'Indian History — Complete Course',channel:'Unacademy',duration:'Playlist',url:'https://www.youtube.com/watch?v=2GikLLvLSHY',tag:'Indian History'},
+          {title:'Modern History — UPSC',channel:'Mrunal Patel',duration:'Playlist',url:'https://www.youtube.com/watch?v=5gMXqY44Nps',tag:'Modern History'}
+        ],
+        iqs:[{q:'What were the main causes of World War I?',a:'MAIN acronym — major causes:\n\nMilitarism: European powers building massive armies, arms race\nAlliances: Triple Alliance (Germany, Austria-Hungary, Italy) vs Triple Entente (Britain, France, Russia)\nImperialism: competition for colonies in Africa and Asia\nNationalism: ethnic groups demanding independence (esp. Balkans)\n\nTrigger: assassination of Archduke Franz Ferdinand (June 1914, Sarajevo)\nAustria-Hungary declared war on Serbia → alliance chain reaction\n\nLong-term: German industrialization, decline of Ottoman Empire, Balkan Wars 1912-13\n\nResult: 20 million dead, dissolution of 4 empires (Ottoman, Austro-Hungarian, Russian, German)'}]
+      },
+      {id:'geo', name:'Geography', icon:'🌍',
+        desc:'Physical · Human · Climate · Maps · Geopolitics',
+        notes:[{title:'Geography Fundamentals',body:'Physical Geography:\n  Lithosphere: Earth\'s crust (plates, earthquakes, volcanoes)\n  Hydrosphere: water (oceans, rivers, glaciers)\n  Atmosphere: weather and climate\n  Biosphere: living organisms and ecosystems\n\nPlate Tectonics:\n  Continental drift → earthquakes, volcanoes, mountains\n  Convergent: plates collide → mountains or trenches\n  Divergent: plates separate → mid-ocean ridges\n  Transform: plates slide → earthquakes (San Andreas)\n\nClimate Zones:\n  Tropical · Subtropical · Temperate · Boreal · Polar\n  Köppen classification: A, B, C, D, E\n\nHuman Geography:\n  Population distribution, migration\n  Urbanization, economic development\n  Geopolitics: territories, borders, resources'}],
+        videos:[
+          {title:'Geography Now! (Country Series)',channel:'Geography Now',duration:'Playlist',url:'https://www.youtube.com/watch?v=Q7x-NDt2e_0',tag:'Countries'},
+          {title:'Physical Geography Full Course',channel:'Professor Leonard',duration:'Playlist',url:'https://www.youtube.com/watch?v=Q7x-NDt2e_0',tag:'Physical Geo'},
+          {title:'Climate Change Explained',channel:'Kurzgesagt',duration:'9:19',url:'https://www.youtube.com/watch?v=wbR-5mHI6bo',tag:'Climate'}
+        ],
+        iqs:[{q:'Explain plate tectonics and its effects.',a:'Plate Tectonics: Earth\'s lithosphere divided into 7 major + several minor plates floating on asthenosphere\n\nTypes of boundaries:\n1. Convergent (collision):\n   Ocean + Ocean → volcanic island arc (Japan)\n   Ocean + Continent → subduction → coastal volcanoes (Andes)\n   Continent + Continent → mountains (Himalayas: India+Eurasia)\n\n2. Divergent (separation):\n   Mid-Atlantic Ridge: spreading, new ocean floor\n   East African Rift Valley: continent splitting\n\n3. Transform (sliding):\n   San Andreas Fault, CA: earthquakes, no mountain building\n\nEffects: earthquakes, volcanic eruptions, mountain ranges, ocean formation, tsunamis'}]
+      },
+      {id:'econ', name:'Economics', icon:'💹',
+        desc:'Micro · Macro · Market Structures · GDP · Inflation · Monetary Policy',
+        notes:[{title:'Economics Fundamentals',body:'Microeconomics (individual/firm level):\n  Supply & Demand: equilibrium price where S=D\n  Elasticity: % change in Q / % change in P\n  Market structures: perfect competition, monopoly, oligopoly\n  Externalities: spillover effects on third parties\n\nMacroeconomics (economy-wide):\n  GDP: total value of goods/services produced\n    GDP = C + I + G + (X-M)\n  Inflation: price level rise — measured by CPI\n  Unemployment: cyclical, frictional, structural\n  Fiscal policy: government spending and taxes\n  Monetary policy: central bank controls money supply\n\nBusiness Cycle: expansion → peak → recession → trough → recovery'}],
+        videos:[
+          {title:'Economics Full Course',channel:'Khan Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=bu0y-4rGi6Q',tag:'Full Course'},
+          {title:'Macroeconomics — Crash Course',channel:'Crash Course',duration:'Playlist',url:'https://www.youtube.com/watch?v=d8uTB5XorBw',tag:'Macro'},
+          {title:'Microeconomics — Crash Course',channel:'Crash Course',duration:'Playlist',url:'https://www.youtube.com/watch?v=aO9-8okCNkE',tag:'Micro'}
+        ],
+        iqs:[{q:'What is GDP and how is it calculated?',a:'GDP (Gross Domestic Product): total monetary value of all final goods and services produced within a country in a period\n\nExpenditure Approach:\n  GDP = C + I + G + (X - M)\n  C = Consumer spending\n  I = Investment (business, residential)\n  G = Government spending\n  X = Exports · M = Imports\n\nOther approaches:\n  Income approach: wages + rents + profits + interest\n  Production approach: sum of value-added at each stage\n\nReal vs Nominal GDP:\n  Nominal: current prices (inflation included)\n  Real: adjusted for inflation (constant prices)\n  Real GDP growth = actual economic growth\n\nLimitations: doesn\'t measure inequality, sustainability, well-being'}]
+      },
+      {id:'eng', name:'English Literature', icon:'📖',
+        desc:'Poetry · Prose · Drama · Literary Devices · Critical Analysis',
+        notes:[{title:'Literary Analysis Framework',body:'PEEL Structure for essays:\n  Point: your argument\n  Evidence: quote or reference\n  Explanation: how evidence supports point\n  Link: connect back to question/theme\n\nLiterary Devices:\n  Metaphor: direct comparison (life is a journey)\n  Simile: comparison using like/as\n  Personification: give human qualities to non-human\n  Alliteration: repeated initial sounds\n  Irony: opposite of what is expected\n  Symbolism: object represents larger concept\n\nPoetry Analysis:\n  Form: sonnet, free verse, ballad, ode\n  Rhyme scheme: ABAB, ABCABC\n  Meter: iambic pentameter (10 syllables, 5 iambs)\n  Tone: the poet\'s attitude toward subject'}],
+        videos:[
+          {title:'How to Analyze Literature',channel:'Crash Course Literature',duration:'Playlist',url:'https://www.youtube.com/watch?v=MSYw502dJNY',tag:'Analysis'},
+          {title:'English Literature — Complete Guide',channel:'Literature and Latte',duration:'Playlist',url:'https://www.youtube.com/watch?v=oJLjLJCkBvo',tag:'Guide'}
+        ],
+        iqs:[{q:'What are the most important literary devices?',a:'Figurative Language:\n  Metaphor: "Life is a journey"\n  Simile: "Brave as a lion"\n  Personification: "The wind whispered"\n  Hyperbole: extreme exaggeration for effect\n\nSound Devices:\n  Alliteration: "Peter Piper picked"\n  Assonance: repeated vowel sounds\n  Onomatopoeia: words sound like what they describe (buzz, crash)\n\nStructural Devices:\n  Irony: dramatic (audience knows), verbal (says opposite), situational\n  Foreshadowing: hint at future events\n  Flashback: return to past events\n  Stream of consciousness: character\'s unfiltered thoughts\n\nIn analysis: always link device → effect → theme/meaning'}]
+      },
+      {id:'polsci', name:'Political Science', icon:'🏛️',
+        desc:'Democracy · Political Theory · Indian Constitution · IR · Governance',
+        notes:[{title:'Political Science Core Concepts',body:'Political Systems:\n  Democracy: majority rule, minority rights\n    Direct: citizens vote directly (Ancient Athens)\n    Representative: elected officials vote (modern democracies)\n  Authoritarianism: concentrated power, limited rights\n  Totalitarianism: absolute state control (Stalin, Hitler)\n\nIndian Constitution:\n  Adopted: 26 January 1950\n  Longest written constitution in world\n  Preamble: Sovereign, Socialist, Secular, Democratic, Republic\n  Fundamental Rights: Articles 12-35\n  DPSP: Article 36-51 (non-justiciable, principles)\n  Fundamental Duties: Article 51A\n\nIR Theories:\n  Realism: states pursue power and security\n  Liberalism: international institutions promote peace\n  Constructivism: norms and identity shape behavior'}],
+        videos:[
+          {title:'Political Theory Full Course',channel:'Khan Academy',duration:'Playlist',url:'https://www.youtube.com/watch?v=rklOs9S9SXQ',tag:'Theory'},
+          {title:'Indian Constitution — Complete Course',channel:'Unacademy',duration:'Playlist',url:'https://www.youtube.com/watch?v=5pPMf70l4LQ',tag:'Indian Constitution'},
+          {title:'International Relations Explained',channel:'CaspianReport',duration:'Playlist',url:'https://www.youtube.com/watch?v=UdT74-5Q5bA',tag:'IR'}
+        ],
+        iqs:[{q:'What are the key features of the Indian Constitution?',a:'Indian Constitution Key Features:\n1. Longest written constitution (395 articles originally)\n2. Federal with unitary bias (strong centre)\n3. Parliamentary democracy (Westminster model)\n4. Fundamental Rights: equality, freedom, against exploitation, religion, culture, constitutional remedies\n5. DPSPs: socio-economic goals (non-justiciable)\n6. Independent judiciary with judicial review\n7. Secular state: no state religion\n8. Universal adult franchise: 18+ vote\n9. Single citizenship\n10. Emergency provisions: national, state, financial\n\nAmendment: Article 368 (simple majority, special majority, or ratification by states)'}]
+      },
+      {id:'psych', name:'Psychology', icon:'🧠',
+        desc:'Cognitive · Developmental · Social · Abnormal · Research Methods',
+        notes:[{title:'Psychology Fundamentals',body:'Major Perspectives:\n  Biological: brain and genetics\n  Psychodynamic: unconscious (Freud)\n  Behavioural: conditioning (Pavlov, Skinner)\n  Cognitive: thinking and perception (Piaget)\n  Humanistic: self-actualization (Maslow, Rogers)\n  Sociocultural: social and cultural influences\n\nMaslow\'s Hierarchy of Needs (bottom→top):\n  Physiological → Safety → Love/Belonging → Esteem → Self-Actualization\n\nMemory:\n  Encoding → Storage → Retrieval\n  Sensory → Short-term (7±2 items) → Long-term\n  Explicit (declarative) vs Implicit (procedural)\n\nCognitive Biases:\n  Confirmation bias, Anchoring, Availability heuristic, Dunning-Kruger'}],
+        videos:[
+          {title:'Intro to Psychology Full Course',channel:'Crash Course',duration:'Playlist',url:'https://www.youtube.com/watch?v=vo4pMVb0R6M',tag:'Full Course'},
+          {title:'Social Psychology',channel:'Crash Course',duration:'Playlist',url:'https://www.youtube.com/watch?v=Ql2yOmCOXmk',tag:'Social Psych'},
+          {title:'Cognitive Psychology',channel:'Sprouts',duration:'Playlist',url:'https://www.youtube.com/watch?v=R-sVnmmw6WY',tag:'Cognitive'}
+        ],
+        iqs:[{q:'Explain classical vs operant conditioning.',a:'Classical Conditioning (Pavlov):\n  Involuntary response to neutral stimulus\n  Unconditioned Stimulus (US) → Unconditioned Response (UR)\n  Neutral Stimulus (NS) paired with US → becomes Conditioned Stimulus (CS)\n  CS alone → Conditioned Response (CR)\n  Example: Bell (NS) + Food (US) → Salivation (UR)\n  After training: Bell (CS) → Salivation (CR)\n\nOperant Conditioning (Skinner):\n  Voluntary behaviour modified by consequences\n  Positive Reinforcement: add good stimulus → increase behaviour\n  Negative Reinforcement: remove bad stimulus → increase behaviour\n  Positive Punishment: add bad stimulus → decrease behaviour\n  Negative Punishment: remove good stimulus → decrease behaviour\n\nKey difference: Classical = reflexive/passive · Operant = voluntary/active'}]
+      }
+    ]
+  }
+];
+
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+var currentSubject = null;
+var chatInited = false, chatOpen = false, dotsEl = null;
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+window.onload = function(){ buildHome(); };
+
+function goBack(){
+  try{ window.location.href='../index.html'; }catch(e){ history.back(); }
+}
+
+// ══════════════════════════════════════════════
+//  HOME — build all categories & chips
+// ══════════════════════════════════════════════
+function buildHome(){
+  var html='';
+  CATEGORIES.forEach(function(cat){
+    html+='<div class="cat-block" data-cat="'+esc(cat.label)+'">';
+    html+='<div class="cat-label" style="color:'+cat.color+'">'+esc(cat.label)+'</div>';
+    html+='<div class="chips">';
+    cat.subjects.forEach(function(s){
+      html+='<div class="chip" onclick="openSubject(\''+s.id+'\')" data-name="'+esc(s.name.toLowerCase())+'">'+esc(s.icon)+' '+esc(s.name)+'</div>';
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('cat-list').innerHTML=html;
+}
+
+function filterSubjects(q){
+  q=q.toLowerCase().trim();
+  document.querySelectorAll('.cat-block').forEach(function(cb){
+    var chips=cb.querySelectorAll('.chip');
+    var any=false;
+    chips.forEach(function(c){
+      var match=!q||c.getAttribute('data-name').indexOf(q)>-1;
+      c.style.display=match?'':'none';
+      if(match)any=true;
+    });
+    cb.style.display=any?'':'none';
+  });
+}
+
+// ══════════════════════════════════════════════
+//  SUBJECT VIEW
+// ══════════════════════════════════════════════
+function findSubject(id){
+  for(var ci=0;ci<CATEGORIES.length;ci++){
+    for(var si=0;si<CATEGORIES[ci].subjects.length;si++){
+      if(CATEGORIES[ci].subjects[si].id===id)
+        return{subj:CATEGORIES[ci].subjects[si],cat:CATEGORIES[ci]};
+    }
+  }
+  return null;
+}
+
+function openSubject(id){
+  var found=findSubject(id);
+  if(!found)return;
+  currentSubject=found.subj;
+  var cat=found.cat;
+  document.getElementById('home-view').style.display='none';
+  document.getElementById('subj-view').style.display='block';
+  document.getElementById('subj-name-bar').textContent=found.subj.icon+' '+found.subj.name;
+  document.getElementById('subj-content').innerHTML=buildSubjHTML(found.subj,cat,'notes');
+  window.scrollTo(0,0);
+}
+
+function closeSubject(){
+  document.getElementById('subj-view').style.display='none';
+  document.getElementById('home-view').style.display='block';
+  currentSubject=null;
+}
+
+function buildSubjHTML(s, cat, activeTab){
+  var color=cat.color;
+  var lightColor=hexToRgba(color,0.08);
+  var borderColor=hexToRgba(color,0.25);
+
+  var tabsHTML=['notes','videos','iq','mynotes'].map(function(t){
+    var labels={notes:'📝 Notes',videos:'▶️ Videos',iq:'❓ Q&A',mynotes:'✏️ My Notes'};
+    return '<button class="itab'+(t===activeTab?' on':'')+'" onclick="switchPane(\''+t+'\')">' + labels[t] + '</button>';
+  }).join('');
+
+  return '<div class="subj-hdr" style="background:'+lightColor+';border:1px solid '+borderColor+'">' +
+    '<div class="subj-ico">'+s.icon+'</div>' +
+    '<div><div class="subj-title">'+esc(s.name)+'</div><div class="subj-cat">'+esc(s.desc)+'</div></div>' +
+    '</div>' +
+    '<div class="itabs">'+tabsHTML+'</div>' +
+    '<div id="ipane-notes" class="ipane'+(activeTab==='notes'?' on':'')+'">' + buildNotes(s.notes||[]) + '</div>' +
+    '<div id="ipane-videos" class="ipane'+(activeTab==='videos'?' on':'')+'">' + buildVideos(s.videos||[]) + '</div>' +
+    '<div id="ipane-iq" class="ipane'+(activeTab==='iq'?' on':'')+'">' + buildIQ(s.iqs||[]) + '</div>' +
+    '<div id="ipane-mynotes" class="ipane'+(activeTab==='mynotes'?' on':'')+'">' + buildMyNotes(s.id) + '</div>';
+}
+
+function switchPane(pane){
+  var order=['notes','videos','iq','mynotes'];
+  document.querySelectorAll('.itab').forEach(function(b,i){ b.classList.toggle('on',order[i]===pane); });
+  document.querySelectorAll('.ipane').forEach(function(p){ p.classList.remove('on'); });
+  var el=document.getElementById('ipane-'+pane);
+  if(el)el.classList.add('on');
+}
+
+// Colour helper
+function hexToRgba(hex,alpha){
+  var r=0,g=0,b=0;
+  if(hex.length===4){r=parseInt(hex[1]+hex[1],16);g=parseInt(hex[2]+hex[2],16);b=parseInt(hex[3]+hex[3],16);}
+  else if(hex.length===7){r=parseInt(hex.slice(1,3),16);g=parseInt(hex.slice(3,5),16);b=parseInt(hex.slice(5,7),16);}
+  return 'rgba('+r+','+g+','+b+','+alpha+')';
+}
+
+// ══════════════════════════════════════════════
+//  NOTES
+// ══════════════════════════════════════════════
+function buildNotes(notes){
+  if(!notes.length) return '<div class="empty"><span>📝</span>Notes coming soon!</div>';
+  return notes.map(function(n){
+    return '<div class="note-chip"><div class="note-chip-t">📌 '+esc(n.title)+'</div><div class="note-chip-b">'+esc(n.body)+'</div></div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+//  VIDEOS — direct YouTube (NO iframe = NO Error 153)
+// ══════════════════════════════════════════════
+function buildVideos(videos){
+  if(!videos.length) return '<div class="empty"><span>▶️</span>Videos coming soon!</div>';
+  var hint='<div class="vid-hint">▶️ <strong>Tap any card</strong> — opens YouTube in new tab. No login needed.</div>';
+  return hint+videos.map(function(v){
+    var safe=v.url.replace(/"/g,'%22');
+    return '<div class="vid-card" data-url="'+safe+'" onclick="openVid(this)">'+
+      '<div class="vid-thumb">▶️</div>'+
+      '<div class="vid-info">'+
+        '<div class="vid-title">'+esc(v.title)+'</div>'+
+        '<div class="vid-meta">'+esc(v.channel)+' · '+esc(v.duration)+'</div>'+
+      '</div>'+
+      '<span class="vid-badge">'+esc(v.tag)+'</span>'+
+      '<span class="vid-arrow">↗</span>'+
+      '</div>';
+  }).join('');
+}
+
+function openVid(el){
+  var t=el.hasAttribute('data-url')?el:el.closest('[data-url]');
+  if(t){var u=t.getAttribute('data-url');if(u)window.open(u,'_blank','noopener,noreferrer');}
+}
+
+// ══════════════════════════════════════════════
+//  Q&A
+// ══════════════════════════════════════════════
+function buildIQ(iqs){
+  if(!iqs.length) return '<div class="empty"><span>❓</span>Q&A coming soon!</div>';
+  return '<p style="font-size:.74rem;color:var(--muted);margin-bottom:10px;">Tap "Show Answer" — great for viva & exam prep.</p>'+
+    iqs.map(function(q,i){
+      var id='iq-'+Date.now()+'-'+i;
+      return '<div class="iq-item">'+
+        '<div class="iq-q"><span class="iq-num">Q'+(i+1)+'</span>'+esc(q.q)+'</div>'+
+        '<button class="iq-btn" onclick="toggleIQ(\''+id+'\',this)">Show Answer ▼</button>'+
+        '<div class="iq-ans" id="'+id+'">'+esc(q.a)+'</div>'+
+        '</div>';
+    }).join('');
+}
+
+function toggleIQ(id,btn){
+  var el=document.getElementById(id);
+  var open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  btn.textContent=open?'Show Answer ▼':'Hide Answer ▲';
+  btn.style.background=open?'':'var(--accent)';
+  btn.style.color=open?'':'#fff';
+  btn.style.borderColor=open?'':'var(--accent)';
+}
+
+// ══════════════════════════════════════════════
+//  MY NOTES
+// ══════════════════════════════════════════════
+function getMyNotes(id){try{return JSON.parse(localStorage.getItem('ep_notes_'+id)||'[]');}catch(e){return[];}}
+function saveMyNotes(id,n){try{localStorage.setItem('ep_notes_'+id,JSON.stringify(n));}catch(e){}}
+
+function buildMyNotes(id){
+  var notes=getMyNotes(id);
+  var saved=notes.length?
+    '<div style="margin-top:14px;"><div style="font-size:.78rem;font-weight:700;margin-bottom:7px;">Saved Notes ('+notes.length+')</div>'+
+    notes.map(function(n,i){
+      return '<div class="saved-note">'+
+        '<div class="sn-hdr"><span class="sn-title">'+esc(n.title)+'</span>'+
+        '<div style="display:flex;gap:5px;align-items:center;"><span class="sn-date">'+esc(n.date)+'</span>'+
+        '<button class="del-btn" onclick="delNote(\''+id+'\','+i+')">🗑</button></div></div>'+
+        '<div class="sn-body">'+esc(n.body)+'</div></div>';
+    }).join('')+'</div>':
+    '<div class="empty"><span>📓</span>No saved notes yet.<br>Write your first note below!</div>';
+
+  return '<div class="notes-ed">'+
+    '<p style="font-size:.76rem;color:var(--muted);margin-bottom:7px;">Personal notes for this subject:</p>'+
+    '<input class="note-title-inp" id="nt-'+id+'" type="text" placeholder="Note title (optional)…"/>'+
+    '<textarea id="nb-'+id+'" placeholder="Write key points, formulas, exam tips…"></textarea>'+
+    '<button class="btn-save" onclick="addNote(\''+id+'\')">💾 Save Note</button>'+
+    '</div>'+saved;
+}
+
+function addNote(id){
+  var ti=document.getElementById('nt-'+id);
+  var bi=document.getElementById('nb-'+id);
+  var body=(bi?bi.value:'').trim();
+  if(!body){showToast('Please write something first!');return;}
+  var title=(ti?ti.value:'').trim()||new Date().toLocaleDateString();
+  var notes=getMyNotes(id);
+  notes.unshift({title:title,body:body,date:new Date().toLocaleString()});
+  saveMyNotes(id,notes);
+  if(ti)ti.value='';if(bi)bi.value='';
+  showToast('✅ Note saved!');
+  var el=document.getElementById('ipane-mynotes');
+  if(el)el.innerHTML=buildMyNotes(id);
+}
+
+function delNote(id,idx){
+  var notes=getMyNotes(id);
+  notes.splice(idx,1);
+  saveMyNotes(id,notes);
+  showToast('🗑 Deleted');
+  var el=document.getElementById('ipane-mynotes');
+  if(el)el.innerHTML=buildMyNotes(id);
+}
+
+// ══════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════
+var toastT=null;
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  if(toastT)clearTimeout(toastT);
+  toastT=setTimeout(function(){t.classList.remove('show');},2200);
+}
+
+// ══════════════════════════════════════════════
+//  ESCAPE
+// ══════════════════════════════════════════════
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════
+//  AI CHATBOT
+// ══════════════════════════════════════════════
+function openChat(){if(!chatOpen)toggleChat();}
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chat-win').classList.toggle('open',chatOpen);
+  if(chatOpen&&!chatInited){chatInited=true;cwGreet();}
+  if(chatOpen){setTimeout(function(){var m=document.getElementById('cw-msgs');m.scrollTop=m.scrollHeight;},80);setTimeout(function(){document.getElementById('cw-inp').focus();},100);}
+}
+
+function cwGreet(){
+  var subj=currentSubject?currentSubject.name:'any subject';
+  cwBot('Hey! 👋 I\'m your **EduPocket AI** Study Assistant!\n\n'+(currentSubject?'Currently viewing: **'+subj+'**\n\n':'')+'Ask me about:\n• Any subject — concepts, tips, mnemonics\n• **FPI score** explanation\n• Study plan & memory tricks\n• Interview/viva prep');
+  cwChips(['What is FPI?','Study tips','Memory tricks','Interview prep']);
+}
+
+function cwSend(){
+  var inp=document.getElementById('cw-inp');
+  var msg=(inp.value||'').trim();
+  if(!msg)return;
+  inp.value='';
+  cwUsr(msg);cwDots();
+  setTimeout(function(){cwUndots();cwBot(cwReply(msg));cwChips(['FPI tips','Study plan','Memory tricks','More help']);},600);
+}
+
+function cwUsr(txt){
+  var m=document.getElementById('cw-msgs');
+  var d=document.createElement('div');d.className='cm usr';
+  var t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  d.innerHTML='<div class="cb">'+esc(txt)+'</div><div class="ct">'+t+'</div>';
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+
+function cwBot(txt){
+  var m=document.getElementById('cw-msgs');
+  var d=document.createElement('div');d.className='cm bot';
+  var t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  var h=txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  d.innerHTML='<div class="cb">'+h+'</div><div class="ct">'+t+'</div>';
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+
+function cwDots(){
+  var m=document.getElementById('cw-msgs');
+  dotsEl=document.createElement('div');dotsEl.className='cm bot';dotsEl.id='_dots';
+  dotsEl.innerHTML='<div class="cb"><div class="cdots"><span></span><span></span><span></span></div></div>';
+  m.appendChild(dotsEl);m.scrollTop=m.scrollHeight;
+}
+function cwUndots(){if(dotsEl){dotsEl.remove();dotsEl=null;}}
+
+function cwChips(list){
+  document.getElementById('cw-qr').innerHTML=list.map(function(c){
+    return '<button class="cqb" onclick="(function(){document.getElementById(\'cw-inp\').value='+JSON.stringify(c)+';cwSend();})()">'+esc(c)+'</button>';
+  }).join('');
+}
+
+function cwReply(msg){
+  var m=msg.toLowerCase();
+  var fpi=null;
+  try{var ctx=JSON.parse(localStorage.getItem('ep_classroom_context')||'{}');fpi=ctx.profile&&ctx.profile.fpi!=null?ctx.profile.fpi:null;}catch(e){}
+
+  if(/^(hi|hello|hey)\b/.test(m))return 'Hey! 👋 Ask me about any subject, FPI, or study strategies!';
+  if(/fpi|forgetful|my score/.test(m)){
+    if(fpi!==null){var lv=fpi<30?'LOW ✅ excellent!':fpi<60?'MODERATE ⚠️ needs practice.':'HIGH 🚨 daily review required.';return '**Your FPI is '+fpi+'/100** — '+lv+'\n\n0–29 🟢 · 30–59 🟡 · 60–100 🔴';}
+    return '**FPI = Forgetfulness Pattern Index** (0–100)\n\nComplete the quiz on the main screen to get your personalised score!';
+  }
+  if(/dsa|data struct|algorithm|sorting|graph|tree/.test(m))return '**DSA Tips:**\n\n🌲 Trees: know BFS vs DFS (Queue vs Stack)\n⚡ DP: find overlapping subproblems + optimal substructure\n📊 Sorting: Merge O(n log n) stable · Quick O(n log n) in-place\n🔍 Binary Search: O(log n) on sorted data\n\nOpen **DSA** subject for full notes & videos!';
+  if(/cloud|aws|iaas|paas|saas/.test(m))return '**Cloud Tips:**\n\n☁️ "I Provide Software" = IaaS/PaaS/SaaS\n📐 Vertical = bigger machine · Horizontal = more machines\n🔐 IAM = Who · VPC = Network · KMS = Keys\n\nOpen **Cloud Computing** for full course!';
+  if(/\bml\b|machine.*learn|neural|deep.*learn|overfit/.test(m))return '**ML Tips:**\n\n⚖️ Bias=underfitting · Variance=overfitting\n📊 F1 for imbalanced · AUC for ranking\n🌳 Random Forest = parallel bagging\n⚡ XGBoost = sequential boosting\n\nOpen **Machine Learning** for full notes!';
+  if(/security|cia|encrypt|hack|cyber/.test(m))return '**Security Tips:**\n\n🔐 CIA: Confidentiality · Integrity · Availability\n🔑 Symmetric (AES) = fast · Asymmetric (RSA) = key exchange\n⚠️ SQLi → parameterised queries\nXSS → output encoding · CSRF → tokens\n\nOpen **Cybersecurity** for full course!';
+  if(/react|node|web.*dev|javascript|html|css/.test(m))return '**Web Dev Tips:**\n\n⚛️ React hooks: useState, useEffect, useContext\n🟢 Node.js: non-blocking I/O, event-driven\n🔗 REST: GET/POST/PUT/DELETE conventions\n📦 JWT: stateless auth — header.payload.signature\n\nOpen the Web Dev subjects for full courses!';
+  if(/docker|kubernetes|devops|ci.*cd/.test(m))return '**DevOps Tips:**\n\n🐳 Docker: container = isolated process, not a VM\n☸️ K8s: Pod → Deployment → Service → Ingress\n🔄 CI/CD: push → test → build → deploy\n📊 Monitor: logs, metrics, traces (3 pillars observability)\n\nOpen **Docker & Kubernetes** for full course!';
+  if(/memory|remember|forget|spaced|trick/.test(m))return '**Memory Techniques:**\n\n🧠 Active Recall: test yourself (don\'t re-read)\n🔁 Spaced Repetition: 10min → 1d → 3d → 1wk → 2wk\n🍋 Feynman: explain it simply out loud\n🗺️ Mind Maps: connect ideas visually\n😴 Sleep: consolidates memory!\n\nYour EduPocket FPI drives your spaced schedule!';
+  if(/interview|viva|exam|prepare|tip/.test(m))return '**Interview/Viva Tips:**\n\n1. **Concept → Intuition → Example** — always this order\n2. **Feynman Technique** — explain to a 10-year-old\n3. For every topic: What? Why? Example? Limitation?\n4. **Active recall** beats re-reading 3×\n5. **Speak aloud** while studying — cements memory faster';
+  if(/study.*plan|how.*study/.test(m)){
+    if(fpi!==null){
+      if(fpi>60)return '**FPI '+fpi+' (High):** Review TODAY!\n1. Active recall every day\n2. 25-min Pomodoro blocks\n3. Follow your trigger schedule';
+      if(fpi>30)return '**FPI '+fpi+' (Moderate):**\n1. Review every 2–3 days\n2. Practice problems over re-reading\n3. Use classroom videos for weak topics';
+      return '**FPI '+fpi+' (Low) — excellent!**\n1. Teach topics to peers (90% retention)\n2. Attempt harder problems\n3. Connect concepts across subjects';
+    }
+    return 'Complete the main quiz to get a **personalised** study plan based on your FPI score!';
+  }
+  if(currentSubject)return 'Ask me specific questions about **'+currentSubject.name+'**, or try:\n• "Tips for '+currentSubject.name+'"\n• "How to remember '+currentSubject.name+'"\n• "Interview questions for '+currentSubject.name+'"';
+  return 'I can help with **any subject** in the classroom! 📚\n\nTry:\n• **"DSA tips"** · **"ML study plan"**\n• **"Memory tricks"** · **"Interview prep"**\n• **"What is FPI?"**\n\nOr open any subject and ask me about it!';
+}
+</script>
+</body>
+</html>

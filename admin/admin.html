@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduPocket — Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Sora',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh;}
+
+    /* ── ADMIN LOGIN ── */
+    #admin-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;}
+    .login-box{background:#1a1d27;border:1px solid #2d3148;border-radius:20px;padding:36px 32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+    .admin-logo{text-align:center;margin-bottom:28px;}
+    .admin-logo .icon{font-size:2.5rem;margin-bottom:8px;}
+    .admin-logo h1{font-size:1.4rem;font-weight:700;color:#fff;}
+    .admin-logo p{font-size:.78rem;color:#6b7280;margin-top:4px;}
+    .badge-admin{display:inline-block;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-size:.65rem;font-weight:700;padding:2px 10px;border-radius:100px;font-family:'Space Mono',monospace;letter-spacing:1px;margin-top:6px;}
+    .al{display:block;font-size:.8rem;font-weight:600;color:#94a3b8;margin-bottom:6px;}
+    .ai{width:100%;background:#0f1117;border:1.5px solid #2d3148;color:#e2e8f0;padding:11px 14px;border-radius:10px;font-family:'Sora',sans-serif;font-size:.9rem;margin-bottom:14px;outline:none;transition:border-color .2s;}
+    .ai:focus{border-color:#7c5cfc;}
+    .ai::placeholder{color:#4b5563;}
+    .ab{width:100%;background:linear-gradient(135deg,#7c5cfc,#5b3fe8);color:#fff;border:none;border-radius:12px;padding:13px;font-family:'Sora',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:4px;transition:all .2s;}
+    .ab:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(124,92,252,.4);}
+    .aerr{font-size:.78rem;color:#ef4444;min-height:18px;margin-bottom:8px;}
+
+    /* ── ADMIN PANEL ── */
+    #admin-panel{display:none;}
+    .topbar{background:#1a1d27;border-bottom:1px solid #2d3148;padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;}
+    .topbar-logo{font-family:'Space Mono',monospace;font-size:.78rem;font-weight:700;color:#7c5cfc;letter-spacing:2px;}
+    .topbar-title{font-size:1rem;font-weight:700;color:#fff;}
+    .topbar-sub{font-size:.72rem;color:#6b7280;margin-left:auto;}
+    .btn-logout-admin{background:#1f2937;color:#9ca3af;border:1px solid #374151;border-radius:8px;padding:7px 14px;font-family:'Sora',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;}
+    .btn-logout-admin:hover{border-color:#ef4444;color:#ef4444;}
+    .btn-refresh{background:linear-gradient(135deg,#7c5cfc,#5b3fe8);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-family:'Sora',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;margin-left:8px;}
+    .btn-refresh:hover{transform:scale(1.03);}
+
+    .content{padding:24px;}
+
+    /* ── STAT CARDS ── */
+    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px;}
+    .scard{background:#1a1d27;border:1px solid #2d3148;border-radius:14px;padding:18px;}
+    .scard .sv{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;margin-bottom:4px;}
+    .scard .sl{font-size:.72rem;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;}
+    .sv.purple{color:#7c5cfc;}.sv.green{color:#22c55e;}.sv.yellow{color:#f59e0b;}.sv.red{color:#ef4444;}.sv.blue{color:#3b82f6;}
+
+    /* ── SEARCH & FILTER ── */
+    .controls{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+    .search-box{flex:1;min-width:200px;background:#1a1d27;border:1.5px solid #2d3148;color:#e2e8f0;padding:9px 14px;border-radius:10px;font-family:'Sora',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;}
+    .search-box:focus{border-color:#7c5cfc;}
+    .search-box::placeholder{color:#4b5563;}
+    .filter-sel{background:#1a1d27;border:1.5px solid #2d3148;color:#94a3b8;padding:9px 12px;border-radius:10px;font-family:'Sora',sans-serif;font-size:.82rem;cursor:pointer;outline:none;}
+    .filter-sel:focus{border-color:#7c5cfc;}
+
+    /* ── TABLE ── */
+    .table-wrap{background:#1a1d27;border:1px solid #2d3148;border-radius:16px;overflow:hidden;overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;min-width:900px;}
+    thead{background:#13151f;}
+    th{padding:13px 16px;font-size:.72rem;font-weight:700;color:#6b7280;text-align:left;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #2d3148;white-space:nowrap;}
+    td{padding:13px 16px;font-size:.82rem;border-bottom:1px solid #1f2337;vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:rgba(124,92,252,.04);}
+
+    .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c5cfc,#43e89e);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.9rem;flex-shrink:0;}
+    .user-cell{display:flex;align-items:center;gap:10px;}
+    .user-cell-info .uname{font-weight:700;font-size:.85rem;color:#fff;}
+    .user-cell-info .usub{font-size:.7rem;color:#6b7280;}
+
+    .fpi-pill{display:inline-block;padding:3px 10px;border-radius:100px;font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;}
+    .fpi-low{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3);}
+    .fpi-med{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);}
+    .fpi-high{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);}
+    .na-pill{background:rgba(107,114,128,.12);color:#6b7280;border:1px solid rgba(107,114,128,.2);display:inline-block;padding:3px 10px;border-radius:100px;font-size:.72rem;}
+
+    .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+    .dot-done{background:#22c55e;}.dot-pending{background:#f59e0b;}.dot-new{background:#3b82f6;}
+
+    .subjects-wrap{display:flex;gap:4px;flex-wrap:wrap;max-width:200px;}
+    .sub-tag{background:#1f2337;border:1px solid #2d3148;color:#94a3b8;padding:2px 8px;border-radius:5px;font-size:.67rem;white-space:nowrap;}
+
+    .action-btn{background:transparent;border:1px solid #2d3148;color:#6b7280;border-radius:7px;padding:5px 11px;font-size:.72rem;cursor:pointer;transition:all .2s;font-family:'Sora',sans-serif;}
+    .action-btn:hover{border-color:#7c5cfc;color:#7c5cfc;}
+    .action-btn.del:hover{border-color:#ef4444;color:#ef4444;}
+
+    /* ── EMPTY STATE ── */
+    .empty-state{text-align:center;padding:60px 24px;}
+    .empty-state .ei{font-size:3rem;margin-bottom:12px;}
+    .empty-state p{color:#6b7280;font-size:.88rem;}
+
+    /* ── MODAL ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.open{display:flex;}
+    .modal{background:#1a1d27;border:1px solid #2d3148;border-radius:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+    .modal-head{padding:20px 24px;border-bottom:1px solid #2d3148;display:flex;align-items:center;justify-content:space-between;}
+    .modal-head h3{font-size:1rem;font-weight:700;}
+    .modal-close{background:transparent;border:none;color:#6b7280;font-size:1.2rem;cursor:pointer;}
+    .modal-body{padding:20px 24px;}
+    .detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid #1f2337;font-size:.83rem;}
+    .detail-row:last-child{border-bottom:none;}
+    .detail-key{color:#6b7280;font-weight:500;flex-shrink:0;margin-right:16px;}
+    .detail-val{color:#e2e8f0;text-align:right;word-break:break-word;}
+    .detail-val.bold{font-weight:700;}
+    .answers-grid{display:grid;gap:6px;margin-top:8px;}
+    .ans-item{background:#13151f;border:1px solid #2d3148;border-radius:8px;padding:8px 12px;font-size:.75rem;}
+    .ans-item .aq{color:#94a3b8;margin-bottom:3px;}
+    .ans-item .aa{color:#e2e8f0;font-weight:600;}
+    .ans-item .aw{font-family:'Space Mono',monospace;font-size:.65rem;color:#f59e0b;}
+
+    /* ── FOOTER ── */
+    .admin-footer{text-align:center;padding:24px;font-size:.72rem;color:#374151;}
+
+    @media(max-width:600px){
+      .topbar{flex-wrap:wrap;gap:8px;}
+      .topbar-sub{margin-left:0;width:100%;}
+      .content{padding:14px;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ ADMIN LOGIN ══════════ -->
+<div id="admin-login">
+  <div class="login-box">
+    <div class="admin-logo">
+      <div class="icon">🔐</div>
+      <h1>EduPocket Admin</h1>
+      <p>Registered User Data Panel</p>
+      <span class="badge-admin">ADMIN ONLY</span>
+    </div>
+    <label class="al">Admin Username</label>
+    <input class="ai" id="a-user" type="text" placeholder="admin"/>
+    <label class="al">Admin Password</label>
+    <input class="ai" id="a-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"/>
+    <div class="aerr" id="a-err"></div>
+    <button class="ab" onclick="adminLogin()">Access Admin Panel →</button>
+    <p style="text-align:center;font-size:.72rem;color:#374151;margin-top:16px;">Default credentials: <code style="color:#7c5cfc;">admin / admin123</code></p>
+  </div>
+</div>
+
+<!-- ══════════ ADMIN PANEL ══════════ -->
+<div id="admin-panel">
+  <div class="topbar">
+    <div class="topbar-logo">EDUPOCKET</div>
+    <div class="topbar-title">👤 User Data Admin Panel</div>
+    <span class="topbar-sub" id="topbar-sub">Loading...</span>
+    <button class="btn-refresh" onclick="loadData()">🔄 Refresh</button>
+    <button class="btn-logout-admin" onclick="adminLogout()">Sign Out</button>
+  </div>
+
+  <div class="content">
+    <!-- Stat Cards -->
+    <div class="stat-row">
+      <div class="scard"><div class="sv purple" id="s-total">0</div><div class="sl">Total Users</div></div>
+      <div class="scard"><div class="sv green"  id="s-done">0</div> <div class="sl">Quiz Completed</div></div>
+      <div class="scard"><div class="sv yellow" id="s-avg">—</div>  <div class="sl">Avg FPI Score</div></div>
+      <div class="scard"><div class="sv red"    id="s-high">0</div> <div class="sl">High Risk (FPI 60+)</div></div>
+      <div class="scard"><div class="sv blue"   id="s-new">0</div>  <div class="sl">No Quiz Yet</div></div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="controls">
+      <input class="search-box" id="search-box" placeholder="🔍  Search by name, username, or subject…" oninput="filterTable()"/>
+      <select class="filter-sel" id="fpi-filter" onchange="filterTable()">
+        <option value="">All FPI Levels</option>
+        <option value="low">Low (0–29)</option>
+        <option value="med">Moderate (30–59)</option>
+        <option value="high">High (60–100)</option>
+        <option value="none">No Quiz</option>
+      </select>
+      <select class="filter-sel" id="sort-by" onchange="filterTable()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="fpi-high">FPI High→Low</option>
+        <option value="fpi-low">FPI Low→High</option>
+        <option value="name">Name A–Z</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table id="users-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>User</th>
+            <th>Real Name</th>
+            <th>FPI Score</th>
+            <th>Quiz Accuracy</th>
+            <th>Subjects</th>
+            <th>Study Level</th>
+            <th>Revision Style</th>
+            <th>Registered</th>
+            <th>Quiz Done</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div id="empty-state" class="empty-state" style="display:none;">
+      <div class="ei">👤</div>
+      <p>No users registered yet.<br>Users will appear here after they sign up on the main site.</p>
+    </div>
+  </div>
+  <div class="admin-footer">EduPocket Admin Panel — Data sourced from browser localStorage · <span id="last-updated"></span></div>
+</div>
+
+<!-- ══════════ USER DETAIL MODAL ══════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 id="modal-title">User Details</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   ADMIN CREDENTIALS (change these!)
+═══════════════════════════════════════════ */
+var ADMIN_USER = 'admin';
+var ADMIN_PASS = 'admin123';
+
+/* ══════════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════════ */
+function adminLogin(){
+  var u = document.getElementById('a-user').value.trim();
+  var p = document.getElementById('a-pass').value;
+  var err = document.getElementById('a-err');
+  if(!u || !p){ err.textContent = 'Please enter credentials.'; return; }
+  if(u !== ADMIN_USER || p !== ADMIN_PASS){
+    err.textContent = 'Incorrect admin credentials.';
+    document.getElementById('a-pass').value = '';
+    return;
+  }
+  err.textContent = '';
+  document.getElementById('admin-login').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  loadData();
+}
+function adminLogout(){
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('admin-login').style.display = 'flex';
+  document.getElementById('a-user').value = '';
+  document.getElementById('a-pass').value = '';
+}
+
+/* ══════════════════════════════════════════
+   DATA LOADING
+═══════════════════════════════════════════ */
+var ALL_USERS = [];
+
+function loadData(){
+  try {
+    var raw = localStorage.getItem('ep_users');
+    var usersObj = raw ? JSON.parse(raw) : {};
+    ALL_USERS = Object.keys(usersObj).map(function(username){
+      return Object.assign({ _username: username }, usersObj[username]);
+    });
+  } catch(e) {
+    ALL_USERS = [];
+  }
+  renderStats();
+  renderTable(ALL_USERS);
+  document.getElementById('last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+  document.getElementById('topbar-sub').textContent = ALL_USERS.length + ' user' + (ALL_USERS.length !== 1 ? 's' : '') + ' registered';
+}
+
+/* ══════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════ */
+function renderStats(){
+  var total   = ALL_USERS.length;
+  var done    = ALL_USERS.filter(function(u){ return u.profile && u.profile.fpi != null; }).length;
+  var noQuiz  = total - done;
+  var fpis    = ALL_USERS.filter(function(u){ return u.profile && u.profile.fpi != null; }).map(function(u){ return u.profile.fpi; });
+  var avg     = fpis.length ? Math.round(fpis.reduce(function(a,b){return a+b;},0) / fpis.length) : null;
+  var high    = fpis.filter(function(f){ return f >= 60; }).length;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-done').textContent  = done;
+  document.getElementById('s-avg').textContent   = avg !== null ? avg : '—';
+  document.getElementById('s-high').textContent  = high;
+  document.getElementById('s-new').textContent   = noQuiz;
+}
+
+/* ══════════════════════════════════════════
+   TABLE RENDER
+═══════════════════════════════════════════ */
+function renderTable(users){
+  var tbody = document.getElementById('table-body');
+  var empty = document.getElementById('empty-state');
+  if(!users.length){
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = users.map(function(u, i){
+    var p = u.profile;
+    var username = u._username;
+    var name     = p ? p.name : '—';
+    var fpi      = p && p.fpi != null ? p.fpi : null;
+    var accuracy = p && p.accuracy != null ? p.accuracy + '%' : '—';
+    var subjects = p && p.subjects ? p.subjects : [];
+    var level    = p ? (p.level || '—') : '—';
+    var style    = p ? (p.revStyle || '—') : '—';
+    var regDate  = u.createdAt ? fmtDate(u.createdAt) : '—';
+    var quizDate = p && p.completedAt ? fmtDate(p.completedAt) : '—';
+
+    var fpiHtml;
+    if(fpi === null){
+      fpiHtml = '<span class="na-pill">No quiz</span>';
+    } else {
+      var cls = fpi < 30 ? 'fpi-low' : fpi < 60 ? 'fpi-med' : 'fpi-high';
+      var lbl = fpi < 30 ? 'LOW' : fpi < 60 ? 'MED' : 'HIGH';
+      fpiHtml = '<span class="fpi-pill '+cls+'">'+fpi+' — '+lbl+'</span>';
+    }
+
+    var subHtml = subjects.length
+      ? '<div class="subjects-wrap">'+subjects.slice(0,3).map(function(s){return '<span class="sub-tag">'+s+'</span>';}).join('')+(subjects.length>3?'<span class="sub-tag">+'+( subjects.length-3)+' more</span>':'')+'</div>'
+      : '<span style="color:#4b5563;font-size:.75rem;">—</span>';
+
+    var quizStatus = p && p.fpi != null
+      ? '<span class="status-dot dot-done"></span>Completed'
+      : (p ? '<span class="status-dot dot-pending"></span>Incomplete' : '<span class="status-dot dot-new"></span>Not started');
+
+    var avatarLetter = name !== '—' ? name.charAt(0).toUpperCase() : username.charAt(0).toUpperCase();
+
+    return '<tr>'+
+      '<td style="color:#4b5563;font-size:.75rem;">'+(i+1)+'</td>'+
+      '<td><div class="user-cell"><div class="avatar">'+avatarLetter+'</div><div class="user-cell-info"><div class="uname">@'+username+'</div><div class="usub">ID #'+(i+1001)+'</div></div></div></td>'+
+      '<td style="font-weight:600;color:#fff;">'+name+'</td>'+
+      '<td>'+fpiHtml+'</td>'+
+      '<td style="font-family:\'Space Mono\',monospace;font-size:.8rem;color:#94a3b8;">'+accuracy+'</td>'+
+      '<td>'+subHtml+'</td>'+
+      '<td style="font-size:.76rem;color:#94a3b8;max-width:140px;">'+level+'</td>'+
+      '<td style="font-size:.76rem;color:#94a3b8;max-width:120px;">'+style+'</td>'+
+      '<td style="font-size:.74rem;color:#4b5563;">'+regDate+'</td>'+
+      '<td style="font-size:.74rem;color:#94a3b8;">'+quizStatus+'</td>'+
+      '<td style="white-space:nowrap;">'+
+        '<button class="action-btn" onclick="showDetail(\''+username+'\')">👁 View</button> '+
+        '<button class="action-btn del" onclick="deleteUser(\''+username+'\')">🗑 Del</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   SEARCH & FILTER
+═══════════════════════════════════════════ */
+function filterTable(){
+  var search = document.getElementById('search-box').value.toLowerCase();
+  var fpiF   = document.getElementById('fpi-filter').value;
+  var sortBy = document.getElementById('sort-by').value;
+
+  var filtered = ALL_USERS.filter(function(u){
+    var p = u.profile;
+    var nameMatch = p && p.name ? p.name.toLowerCase().includes(search) : false;
+    var unameMatch = u._username.toLowerCase().includes(search);
+    var subMatch = p && p.subjects ? p.subjects.some(function(s){return s.toLowerCase().includes(search);}) : false;
+    if(search && !nameMatch && !unameMatch && !subMatch) return false;
+
+    if(fpiF){
+      var fpi = p && p.fpi != null ? p.fpi : null;
+      if(fpiF === 'low'  && !(fpi != null && fpi < 30))   return false;
+      if(fpiF === 'med'  && !(fpi != null && fpi >= 30 && fpi < 60)) return false;
+      if(fpiF === 'high' && !(fpi != null && fpi >= 60))  return false;
+      if(fpiF === 'none' && fpi != null) return false;
+    }
+    return true;
+  });
+
+  filtered.sort(function(a, b){
+    var ap = a.profile, bp = b.profile;
+    if(sortBy === 'newest') return (b.createdAt||0) - (a.createdAt||0);
+    if(sortBy === 'oldest') return (a.createdAt||0) - (b.createdAt||0);
+    if(sortBy === 'fpi-high') return ((bp&&bp.fpi!=null?bp.fpi:-1)) - ((ap&&ap.fpi!=null?ap.fpi:-1));
+    if(sortBy === 'fpi-low')  return ((ap&&ap.fpi!=null?ap.fpi:101)) - ((bp&&bp.fpi!=null?bp.fpi:101));
+    if(sortBy === 'name'){
+      var an=(ap&&ap.name)||a._username, bn=(bp&&bp.name)||b._username;
+      return an.localeCompare(bn);
+    }
+    return 0;
+  });
+
+  renderTable(filtered);
+}
+
+/* ══════════════════════════════════════════
+   DETAIL MODAL
+═══════════════════════════════════════════ */
+var QUIZ_CATS = [
+  'Memory Retention','Revision Habits','Sleep & Consolidation','Spaced Repetition',
+  'Context Dependency','Cognitive Load','Interference','Emotional Encoding',
+  'Output Practice','Distraction Level','Metacognition','Motivation & Consistency'
+];
+var QUIZ_OPTS = [
+  ['Within 24 hours','Within 3 days','Within a week','I remember for weeks'],
+  ['Never — re-read only','Rarely','Sometimes','Always — self-test'],
+  ['< 5 hours','5–6 hours','6–7 hours','7–9 hours'],
+  ['Never review','Just before exam','Every few days','Spaced repetition'],
+  ['Very hard','Hard','Moderate','Easy — recall freely'],
+  ['Completely exhausted','Tired, long break','Slightly tired','Energised'],
+  ['Everything mixed up','Somewhat blurs','A little','Not at all'],
+  ['Not at all','Rarely','Sometimes','Very connected'],
+  ['Never','Rarely','Sometimes','Often — always summarise'],
+  ['Very distracted','Moderately','Slightly','Barely — deep focus'],
+  ['Poorly — overconfident','Misjudge half','Mostly well','Very accurately'],
+  ['Very inconsistent','Often skipping','Mostly consistent','Highly consistent']
+];
+
+function showDetail(username){
+  try {
+    var raw = localStorage.getItem('ep_users');
+    var usersObj = raw ? JSON.parse(raw) : {};
+    var u = usersObj[username];
+    if(!u){ alert('User not found.'); return; }
+    var p = u.profile;
+    document.getElementById('modal-title').textContent = '👤 ' + (p ? p.name : username) + ' (@'+username+')';
+    var fpiCls = !p || p.fpi == null ? '' : p.fpi < 30 ? 'fpi-low' : p.fpi < 60 ? 'fpi-med' : 'fpi-high';
+    var fpiLbl = !p || p.fpi == null ? 'No quiz taken' : p.fpi + ' / 100 — '+(p.fpi<30?'LOW':p.fpi<60?'MODERATE':'HIGH');
+    var html = '';
+    html += '<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #2d3148;">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">';
+    html += '<div class="avatar" style="width:48px;height:48px;font-size:1.3rem;">'+(p&&p.name?p.name.charAt(0).toUpperCase():username.charAt(0).toUpperCase())+'</div>';
+    html += '<div><div style="font-size:1rem;font-weight:700;color:#fff;">'+(p&&p.name?p.name:'—')+'</div><div style="font-size:.75rem;color:#6b7280;">@'+username+'</div></div>';
+    if(p && p.fpi != null) html += '<span class="fpi-pill '+fpiCls+'" style="margin-left:auto;">'+fpiLbl+'</span>';
+    html += '</div></div>';
+
+    var rows = [
+      ['Username', '@'+username],
+      ['Full Name', p ? p.name||'—' : '—'],
+      ['FPI Score', fpiLbl],
+      ['Quiz Accuracy', p && p.accuracy != null ? p.accuracy+'%' : '—'],
+      ['Study Level', p ? p.level||'—' : '—'],
+      ['Daily Study Hours', p ? p.hours||'—' : '—'],
+      ['Revision Style', p ? p.revStyle||'—' : '—'],
+      ['Subjects', p && p.subjects ? p.subjects.join(', ') : '—'],
+      ['Streak', p ? (p.streak||0)+' days' : '—'],
+      ['Account Created', u.createdAt ? fmtDateFull(u.createdAt) : '—'],
+      ['Quiz Completed', p && p.completedAt ? fmtDateFull(p.completedAt) : 'Not yet']
+    ];
+    html += rows.map(function(r){
+      return '<div class="detail-row"><span class="detail-key">'+r[0]+'</span><span class="detail-val '+(r[0]==='FPI Score'?'bold':'')+'">'+r[1]+'</span></div>';
+    }).join('');
+
+    // Quiz Answers
+    if(p && p.answers && p.answers.length){
+      html += '<div style="margin-top:18px;"><div style="font-size:.78rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">📝 Quiz Answers</div>';
+      html += '<div class="answers-grid">';
+      p.answers.forEach(function(a, i){
+        var opts = QUIZ_OPTS[a.q] || [];
+        html += '<div class="ans-item">'+
+          '<div class="aq">Q'+(a.q+1)+'. '+QUIZ_CATS[a.q]+'</div>'+
+          '<div class="aa">'+(opts[a.chosen]||'—')+'</div>'+
+          '<div class="aw">Weight: '+a.weight+'/3 '+(a.weight===0?'✅':'⚠️')+'</div>'+
+        '</div>';
+      });
+      html += '</div></div>';
+    }
+
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('open');
+  } catch(e) {
+    alert('Error loading user details.');
+  }
+}
+function closeModal(e){
+  if(!e || e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+/* ══════════════════════════════════════════
+   DELETE USER
+═══════════════════════════════════════════ */
+function deleteUser(username){
+  if(!confirm('Are you sure you want to delete user "@'+username+'"?\nThis cannot be undone.')) return;
+  try {
+    var raw = localStorage.getItem('ep_users');
+    var usersObj = raw ? JSON.parse(raw) : {};
+    delete usersObj[username];
+    localStorage.setItem('ep_users', JSON.stringify(usersObj));
+    loadData();
+  } catch(e) {
+    alert('Error deleting user.');
+  }
+}
+
+/* ══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+function fmtDate(ts){
+  if(!ts) return '—';
+  var d = new Date(ts);
+  return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
+}
+function fmtDateFull(ts){
+  if(!ts) return '—';
+  var d = new Date(ts);
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── KEYBOARD SHORTCUT ──
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
